@@ -1,5 +1,6 @@
 // Appwrite SDK Client and Database initialization
-import { Client, Databases, Query } from 'https://cdn.jsdelivr.net/npm/appwrite@11.0.0/dist/esm/sdk.js';
+// Ensure that 'ID' is explicitly imported if you plan to use ID.unique() directly
+import { Client, Databases, Query, ID } from 'https://cdn.jsdelivr.net/npm/appwrite@11.0.0/dist/esm/sdk.js';
 
 // --- Appwrite Configuration ---
 const APPWRITE_ENDPOINT = 'https://cloud.appwrite.io/v1'; // Your Appwrite Endpoint
@@ -79,6 +80,8 @@ async function uploadFileToS3Archive(file) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log("DOMContentLoaded fired. Script is running.");
+
     // --- Mobile Menu Logic --- (Unchanged from previous versions)
     const mobileMenuIcon = document.querySelector('.mobile-menu-icon');
     const mobileNavOverlay = document.createElement('div');
@@ -180,20 +183,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Open Modal
     if (developerButton) {
+        console.log("Developer button found. Adding click listener.");
         developerButton.addEventListener('click', () => {
-            developerModal.style.display = 'flex'; // Use flex to center
-            document.body.style.overflow = 'hidden'; // Prevent scrolling body
+            console.log("Developer button clicked!");
+            if (developerModal) {
+                developerModal.style.display = 'flex'; // Use flex to center
+                document.body.style.overflow = 'hidden'; // Prevent scrolling body
+                console.log("Developer modal should be visible now.");
+            } else {
+                console.error("Developer modal element not found!");
+            }
         });
+    } else {
+        console.error("Developer button element not found!");
     }
 
     // Close Modal
-    modalCloseButton.addEventListener('click', () => {
-        developerModal.style.display = 'none';
-        document.body.style.overflow = ''; // Restore body scrolling
-        appSubmissionForm.reset(); // Reset form fields
-        resetFormErrors(); // Clear validation errors
-        clearPreviews(); // Clear image previews
-    });
+    if (modalCloseButton) {
+        modalCloseButton.addEventListener('click', () => {
+            developerModal.style.display = 'none';
+            document.body.style.overflow = ''; // Restore body scrolling
+            appSubmissionForm.reset(); // Reset form fields
+            resetFormErrors(); // Clear validation errors
+            clearPreviews(); // Clear image previews
+            console.log("Developer modal closed.");
+        });
+    }
+
 
     // Close Modal if clicked outside content
     window.addEventListener('click', (event) => {
@@ -203,324 +219,340 @@ document.addEventListener('DOMContentLoaded', async () => {
             appSubmissionForm.reset();
             resetFormErrors();
             clearPreviews();
+            console.log("Developer modal closed by clicking outside.");
         }
     });
 
     // Handle character counts for text areas
-    shortDescription.addEventListener('input', () => {
-        shortDescCharCount.textContent = `${shortDescription.value.length}/100`;
-        validateField(shortDescription, shortDescriptionError, 'Short description cannot be empty.', shortDescription.value.length > 0);
-    });
+    if (shortDescription) {
+        shortDescription.addEventListener('input', () => {
+            shortDescCharCount.textContent = `${shortDescription.value.length}/100`;
+            validateField(shortDescription, shortDescriptionError, 'Short description cannot be empty.', shortDescription.value.length > 0);
+        });
+    }
 
-    longDescription.addEventListener('input', () => {
-        longDescCharCount.textContent = `${longDescription.value.length}/400`;
-        validateField(longDescription, longDescriptionError, 'Full description cannot be empty.', longDescription.value.length > 0);
-    });
+    if (longDescription) {
+        longDescription.addEventListener('input', () => {
+            longDescCharCount.textContent = `${longDescription.value.length}/400`;
+            validateField(longDescription, longDescriptionError, 'Full description cannot be empty.', longDescription.value.length > 0);
+        });
+    }
 
     // Image Preview for App Logo (Square format)
-    appLogoInput.addEventListener('change', (event) => {
-        appLogoPreview.innerHTML = ''; // Clear previous preview
-        appLogoError.style.display = 'none'; // Hide error
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    // Check if image is square
-                    if (img.width === img.height) {
-                        const existingImg = appLogoPreview.querySelector('img');
-                        if (existingImg) appLogoPreview.removeChild(existingImg); // Remove previous image
-                        const newImg = document.createElement('img');
-                        newImg.src = e.target.result;
-                        appLogoPreview.appendChild(newImg);
-                    } else {
-                        appLogoInput.value = ''; // Clear input
-                        appLogoPreview.innerHTML = '';
-                        appLogoError.textContent = 'Logo must be square (e.g., 200x200 pixels).';
-                        appLogoError.style.display = 'block';
-                    }
+    if (appLogoInput) {
+        appLogoInput.addEventListener('change', (event) => {
+            appLogoPreview.innerHTML = ''; // Clear previous preview
+            appLogoError.style.display = 'none'; // Hide error
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        // Check if image is square
+                        if (img.width === img.height) {
+                            const existingImg = appLogoPreview.querySelector('img');
+                            if (existingImg) appLogoPreview.removeChild(existingImg); // Remove previous image
+                            const newImg = document.createElement('img');
+                            newImg.src = e.target.result;
+                            appLogoPreview.appendChild(newImg);
+                        } else {
+                            appLogoInput.value = ''; // Clear input
+                            appLogoPreview.innerHTML = '';
+                            appLogoError.textContent = 'Logo must be square (e.g., 200x200 pixels).';
+                            appLogoError.style.display = 'block';
+                        }
+                    };
+                    img.src = e.target.result;
                 };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    });
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
 
     // Image Preview for App Screenshots (16:9 or 9:16)
     let uploadedImages = []; // Store validated images for submission later
-    appImagesInput.addEventListener('change', (event) => {
-        appImagesPreviewContainer.innerHTML = ''; // Clear previous previews
-        appImagesError.style.display = 'none'; // Hide error
-        uploadedImages = []; // Clear previous uploaded images
+    if (appImagesInput) {
+        appImagesInput.addEventListener('change', (event) => {
+            appImagesPreviewContainer.innerHTML = ''; // Clear previous previews
+            appImagesError.style.display = 'none'; // Hide error
+            uploadedImages = []; // Clear previous uploaded images
 
-        const files = Array.from(event.target.files);
+            const files = Array.from(event.target.files);
 
-        if (files.length < 2 || files.length > 5) {
-            appImagesError.textContent = 'Please upload between 2 and 5 screenshots.';
-            appImagesError.style.display = 'block';
-            appImagesInput.value = ''; // Clear input
-            return;
-        }
+            if (files.length < 2 || files.length > 5) {
+                appImagesError.textContent = 'Please upload between 2 and 5 screenshots.';
+                appImagesError.style.display = 'block';
+                appImagesInput.value = ''; // Clear input
+                return;
+            }
 
-        let processingCount = 0;
-        files.forEach(file => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    processingCount++;
-                    const aspectRatio = img.width / img.height;
-                    const is16_9 = Math.abs(aspectRatio - (16 / 9)) < 0.01;
-                    const is9_16 = Math.abs(aspectRatio - (9 / 16)) < 0.01;
+            let processingCount = 0;
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        processingCount++;
+                        const aspectRatio = img.width / img.height;
+                        const is16_9 = Math.abs(aspectRatio - (16 / 9)) < 0.01;
+                        const is9_16 = Math.abs(aspectRatio - (9 / 16)) < 0.01;
 
-                    if (is16_9 || is9_16) {
-                        const previewItem = document.createElement('div');
-                        previewItem.classList.add('image-preview-item');
-                        if (is9_16) {
-                            previewItem.classList.add('portrait');
-                        }
-                        const imgElement = document.createElement('img');
-                        imgElement.src = e.target.result;
-                        previewItem.appendChild(imgElement);
-
-                        const removeButton = document.createElement('span');
-                        removeButton.classList.add('remove-image');
-                        removeButton.innerHTML = '&times;';
-                        removeButton.addEventListener('click', () => {
-                            const indexToRemove = uploadedImages.indexOf(file);
-                            if (indexToRemove > -1) {
-                                uploadedImages.splice(indexToRemove, 1); // Remove from array
+                        if (is16_9 || is9_16) {
+                            const previewItem = document.createElement('div');
+                            previewItem.classList.add('image-preview-item');
+                            if (is9_16) {
+                                previewItem.classList.add('portrait');
                             }
-                            previewItem.remove(); // Remove from DOM
-                            // Re-validate count after removal
-                            if (uploadedImages.length < 2 && appImagesInput.files.length > 0) { // Only show error if user initially selected files
+                            const imgElement = document.createElement('img');
+                            imgElement.src = e.target.result;
+                            previewItem.appendChild(imgElement);
+
+                            const removeButton = document.createElement('span');
+                            removeButton.classList.add('remove-image');
+                            removeButton.innerHTML = '&times;';
+                            removeButton.addEventListener('click', () => {
+                                const indexToRemove = uploadedImages.indexOf(file);
+                                if (indexToRemove > -1) {
+                                    uploadedImages.splice(indexToRemove, 1); // Remove from array
+                                }
+                                previewItem.remove(); // Remove from DOM
+                                // Re-validate count after removal
+                                if (uploadedImages.length < 2 && appImagesInput.files.length > 0) { // Only show error if user initially selected files
+                                    appImagesError.textContent = 'Minimum 2 screenshots required.';
+                                    appImagesError.style.display = 'block';
+                                } else {
+                                    appImagesError.style.display = 'none';
+                                }
+                            });
+                            previewItem.appendChild(removeButton);
+                            appImagesPreviewContainer.appendChild(previewItem);
+                            uploadedImages.push(file); // Add to array only if valid
+                        } else {
+                            // If any image is invalid, clear all and show error
+                            showGeneralMessageBox('Invalid Image Aspect Ratio', `Image '${file.name}' has an invalid aspect ratio. Please upload 16:9 or 9:16 images.`);
+                            appImagesInput.value = '';
+                            appImagesPreviewContainer.innerHTML = '';
+                            uploadedImages = [];
+                            appImagesError.textContent = 'One or more images have an invalid aspect ratio.';
+                            appImagesError.style.display = 'block';
+                        }
+
+                        // After all selected files are processed, check the final count
+                        if (processingCount === files.length) {
+                            if (uploadedImages.length < 2) {
                                 appImagesError.textContent = 'Minimum 2 screenshots required.';
                                 appImagesError.style.display = 'block';
+                            } else if (uploadedImages.length > 5) {
+                                 appImagesError.textContent = 'Maximum 5 screenshots allowed.';
+                                 appImagesError.style.display = 'block';
                             } else {
                                 appImagesError.style.display = 'none';
                             }
-                        });
-                        previewItem.appendChild(removeButton);
-                        appImagesPreviewContainer.appendChild(previewItem);
-                        uploadedImages.push(file); // Add to array only if valid
-                    } else {
-                        // If any image is invalid, clear all and show error
-                        showGeneralMessageBox('Invalid Image Aspect Ratio', `Image '${file.name}' has an invalid aspect ratio. Please upload 16:9 or 9:16 images.`);
-                        appImagesInput.value = '';
-                        appImagesPreviewContainer.innerHTML = '';
-                        uploadedImages = [];
-                        appImagesError.textContent = 'One or more images have an invalid aspect ratio.';
-                        appImagesError.style.display = 'block';
-                    }
-
-                    // After all selected files are processed, check the final count
-                    if (processingCount === files.length) {
-                        if (uploadedImages.length < 2) {
-                            appImagesError.textContent = 'Minimum 2 screenshots required.';
-                            appImagesError.style.display = 'block';
-                        } else if (uploadedImages.length > 5) {
-                             appImagesError.textContent = 'Maximum 5 screenshots allowed.';
-                             appImagesError.style.display = 'block';
-                        } else {
-                            appImagesError.style.display = 'none';
                         }
-                    }
+                    };
+                    img.src = e.target.result;
                 };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+                reader.readAsDataURL(file);
+            });
         });
-    });
+    }
 
 
     // Handle distribution method change
-    distributeUrlRadio.addEventListener('change', () => {
-        websiteUrlGroup.style.display = 'block';
-        apkUploadGroup.style.display = 'none';
-        websiteUrlInput.setAttribute('required', 'required');
-        apkFileInput.removeAttribute('required');
-        apkFileInput.value = ''; // Clear APK input if switching
-        apkFileError.style.display = 'none'; // Hide error
-    });
+    if (distributeUrlRadio && distributeApkRadio && websiteUrlGroup && apkUploadGroup) {
+        distributeUrlRadio.addEventListener('change', () => {
+            websiteUrlGroup.style.display = 'block';
+            apkUploadGroup.style.display = 'none';
+            websiteUrlInput.setAttribute('required', 'required');
+            apkFileInput.removeAttribute('required');
+            apkFileInput.value = ''; // Clear APK input if switching
+            apkFileError.style.display = 'none'; // Hide error
+        });
 
-    distributeApkRadio.addEventListener('change', () => {
-        websiteUrlGroup.style.display = 'none';
-        apkUploadGroup.style.display = 'block';
-        apkFileInput.setAttribute('required', 'required');
-        websiteUrlInput.removeAttribute('required');
-        websiteUrlInput.value = ''; // Clear URL input if switching
-        websiteUrlError.style.display = 'none'; // Hide error
-    });
+        distributeApkRadio.addEventListener('change', () => {
+            websiteUrlGroup.style.display = 'none';
+            apkUploadGroup.style.display = 'block';
+            apkFileInput.setAttribute('required', 'required');
+            websiteUrlInput.removeAttribute('required');
+            websiteUrlInput.value = ''; // Clear URL input if switching
+            websiteUrlError.style.display = 'none'; // Hide error
+        });
+    }
+
 
     // Form Submission Handler
-    appSubmissionForm.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Prevent default form submission
-        resetFormErrors(); // Clear previous errors
+    if (appSubmissionForm) {
+        appSubmissionForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
+            resetFormErrors(); // Clear previous errors
 
-        let isValid = true;
+            let isValid = true;
 
-        // Validation for App Name
-        isValid = validateField(document.getElementById('appName'), appNameError, 'App Name cannot be empty.', document.getElementById('appName').value.trim() !== '') && isValid;
+            // Validation for App Name
+            isValid = validateField(document.getElementById('appName'), appNameError, 'App Name cannot be empty.', document.getElementById('appName').value.trim() !== '') && isValid;
 
-        // Validation for App Logo
-        if (!appLogoInput.files[0]) {
-            appLogoError.textContent = 'Please upload an app logo.';
-            appLogoError.style.display = 'block';
-            isValid = false;
-        } else {
-             // Re-check square aspect ratio during submission for logo
-             const file = appLogoInput.files[0];
-             const img = new Image();
-             img.src = URL.createObjectURL(file);
-             await new Promise(resolve => img.onload = resolve);
-             if (img.width !== img.height) {
-                appLogoError.textContent = 'Logo must be square (e.g., 200x200 pixels).';
+            // Validation for App Logo
+            if (!appLogoInput.files[0]) {
+                appLogoError.textContent = 'Please upload an app logo.';
                 appLogoError.style.display = 'block';
                 isValid = false;
-             }
-        }
-
-
-        // Validation for Short Description
-        isValid = validateField(shortDescription, shortDescriptionError, 'Short description cannot be empty.', shortDescription.value.trim() !== '') && isValid;
-        isValid = validateField(shortDescription, shortDescriptionError, 'Short description cannot exceed 100 characters.', shortDescription.value.length <= 100) && isValid;
-
-
-        // Validation for Long Description
-        isValid = validateField(longDescription, longDescriptionError, 'Full description cannot be empty.', longDescription.value.trim() !== '') && isValid;
-        isValid = validateField(longDescription, longDescriptionError, 'Full description cannot exceed 400 characters.', longDescription.value.length <= 400) && isValid;
-
-
-        // Validation for App Images
-        if (uploadedImages.length < 2 || uploadedImages.length > 5) {
-            appImagesError.textContent = 'Please upload between 2 and 5 screenshots.';
-            appImagesError.style.display = 'block';
-            isValid = false;
-        } else {
-            // Re-validate aspect ratios during submission for images
-            for (const file of uploadedImages) {
-                const img = new Image();
-                img.src = URL.createObjectURL(file);
-                await new Promise(resolve => img.onload = resolve);
-                const aspectRatio = img.width / img.height;
-                const is16_9 = Math.abs(aspectRatio - (16 / 9)) < 0.01;
-                const is9_16 = Math.abs(aspectRatio - (9 / 16)) < 0.01;
-                if (!is16_9 && !is9_16) {
-                    appImagesError.textContent = `Image '${file.name}' has an invalid aspect ratio. Please upload 16:9 or 9:16 images.`;
-                    appImagesError.style.display = 'block';
+            } else {
+                 // Re-check square aspect ratio during submission for logo
+                 const file = appLogoInput.files[0];
+                 const img = new Image();
+                 img.src = URL.createObjectURL(file);
+                 await new Promise(resolve => img.onload = resolve);
+                 if (img.width !== img.height) {
+                    appLogoError.textContent = 'Logo must be square (e.g., 200x200 pixels).';
+                    appLogoError.style.display = 'block';
                     isValid = false;
-                    break;
+                 }
+            }
+
+
+            // Validation for Short Description
+            isValid = validateField(shortDescription, shortDescriptionError, 'Short description cannot be empty.', shortDescription.value.trim() !== '') && isValid;
+            isValid = validateField(shortDescription, shortDescriptionError, 'Short description cannot exceed 100 characters.', shortDescription.value.length <= 100) && isValid;
+
+
+            // Validation for Long Description
+            isValid = validateField(longDescription, longDescriptionError, 'Full description cannot be empty.', longDescription.value.trim() !== '') && isValid;
+            isValid = validateField(longDescription, longDescriptionError, 'Full description cannot exceed 400 characters.', longDescription.value.length <= 400) && isValid;
+
+
+            // Validation for App Images
+            if (uploadedImages.length < 2 || uploadedImages.length > 5) {
+                appImagesError.textContent = 'Please upload between 2 and 5 screenshots.';
+                appImagesError.style.display = 'block';
+                isValid = false;
+            } else {
+                // Re-validate aspect ratios during submission for images
+                for (const file of uploadedImages) {
+                    const img = new Image();
+                    img.src = URL.createObjectURL(file);
+                    await new Promise(resolve => img.onload = resolve);
+                    const aspectRatio = img.width / img.height;
+                    const is16_9 = Math.abs(aspectRatio - (16 / 9)) < 0.01;
+                    const is9_16 = Math.abs(aspectRatio - (9 / 16)) < 0.01;
+                    if (!is16_9 && !is9_16) {
+                        appImagesError.textContent = `Image '${file.name}' has an invalid aspect ratio. Please upload 16:9 or 9:16 images.`;
+                        appImagesError.style.display = 'block';
+                        isValid = false;
+                        break;
+                    }
                 }
             }
-        }
 
-        // Validation for Category
-        isValid = validateField(document.getElementById('appCategory'), appCategoryError, 'Please select a category.', document.getElementById('appCategory').value !== '') && isValid;
+            // Validation for Category
+            isValid = validateField(document.getElementById('appCategory'), appCategoryError, 'Please select a category.', document.getElementById('appCategory').value !== '') && isValid;
 
 
-        // Validation for Distribution Method
-        if (distributeUrlRadio.checked) {
-            isValid = validateField(websiteUrlInput, websiteUrlError, 'Website URL cannot be empty.', websiteUrlInput.value.trim() !== '') && isValid;
-            isValid = validateField(websiteUrlInput, websiteUrlError, 'Please enter a valid URL.', isValidUrl(websiteUrlInput.value.trim())) && isValid;
-        } else if (distributeApkRadio.checked) {
-            if (!apkFileInput.files[0]) {
-                apkFileError.textContent = 'Please upload an APK file.';
-                apkFileError.style.display = 'block';
+            // Validation for Distribution Method
+            if (distributeUrlRadio.checked) {
+                isValid = validateField(websiteUrlInput, websiteUrlError, 'Website URL cannot be empty.', websiteUrlInput.value.trim() !== '') && isValid;
+                isValid = validateField(websiteUrlInput, websiteUrlError, 'Please enter a valid URL.', isValidUrl(websiteUrlInput.value.trim())) && isValid;
+            } else if (distributeApkRadio.checked) {
+                if (!apkFileInput.files[0]) {
+                    apkFileError.textContent = 'Please upload an APK file.';
+                    apkFileError.style.display = 'block';
+                    isValid = false;
+                } else if (apkFileInput.files[0].type !== 'application/vnd.android.package-archive' && apkFileInput.files[0].name.split('.').pop().toLowerCase() !== 'apk') {
+                    apkFileError.textContent = 'Only .apk files are allowed.';
+                    apkFileError.style.display = 'block';
+                    isValid = false;
+                }
+            } else {
+                distributionMethodError.textContent = 'Please choose a distribution method.';
+                distributionMethodError.style.display = 'block';
                 isValid = false;
-            } else if (apkFileInput.files[0].type !== 'application/vnd.android.package-archive' && apkFileInput.files[0].name.split('.').pop().toLowerCase() !== 'apk') {
-                apkFileError.textContent = 'Only .apk files are allowed.';
-                apkFileError.style.display = 'block';
-                isValid = false;
-            }
-        } else {
-            distributionMethodError.textContent = 'Please choose a distribution method.';
-            distributionMethodError.style.display = 'block';
-            isValid = false;
-        }
-
-
-        // Validation for Developer Name
-        isValid = validateField(document.getElementById('developerName'), developerNameError, 'Developer Name cannot be empty.', document.getElementById('developerName').value.trim() !== '') && isValid;
-
-        // Validation for Developer Email
-        isValid = validateField(document.getElementById('developerEmail'), developerEmailError, 'Developer Email cannot be empty.', document.getElementById('developerEmail').value.trim() !== '') && isValid;
-        isValid = validateField(document.getElementById('developerEmail'), developerEmailError, 'Please enter a valid email address.', isValidEmail(document.getElementById('developerEmail').value.trim())) && isValid;
-
-
-        if (!isValid) {
-            showGeneralMessageBox('Submission Failed', 'Please correct the errors in the form.');
-            return;
-        }
-
-        // --- Prepare Data for Appwrite and Simulated File Uploads ---
-        let appData = {
-            appName: document.getElementById('appName').value,
-            shortDescription: shortDescription.value,
-            longDescription: longDescription.value,
-            appCategory: document.getElementById('appCategory').value,
-            distributionMethod: document.querySelector('input[name="distributionMethod"]:checked').value,
-            websiteUrl: websiteUrlInput.value,
-            apkUrl: '', // Will be filled if APK is uploaded
-            developerName: document.getElementById('developerName').value,
-            developerEmail: document.getElementById('developerEmail').value,
-            submissionDate: new Date().toISOString(), // Appwrite uses ISO strings for datetime
-            status: 'Pending', // Initial status
-            appLogoUrl: '', // Will be filled after upload
-            appImageUrls: [] // Will be filled after uploads
-        };
-
-        const appLogoFile = appLogoInput.files[0];
-        const apkFile = apkFileInput.files[0];
-
-        try {
-            // Upload App Logo
-            if (appLogoFile) {
-                appData.appLogoUrl = await uploadFileToS3Archive(appLogoFile);
             }
 
-            // Upload App Images
-            appData.appImageUrls = [];
-            for (const imageFile of uploadedImages) {
-                const imageUrl = await uploadFileToS3Archive(imageFile);
-                appData.appImageUrls.push(imageUrl);
+
+            // Validation for Developer Name
+            isValid = validateField(document.getElementById('developerName'), developerNameError, 'Developer Name cannot be empty.', document.getElementById('developerName').value.trim() !== '') && isValid;
+
+            // Validation for Developer Email
+            isValid = validateField(document.getElementById('developerEmail'), developerEmailError, 'Developer Email cannot be empty.', document.getElementById('developerEmail').value.trim() !== '') && isValid;
+            isValid = validateField(document.getElementById('developerEmail'), developerEmailError, 'Please enter a valid email address.', isValidEmail(document.getElementById('developerEmail').value.trim())) && isValid;
+
+
+            if (!isValid) {
+                showGeneralMessageBox('Submission Failed', 'Please correct the errors in the form.');
+                return;
             }
 
-            // Upload APK if distribution method is APK
-            if (appData.distributionMethod === 'apk' && apkFile) {
-                appData.apkUrl = await uploadFileToS3Archive(apkFile);
+            // --- Prepare Data for Appwrite and Simulated File Uploads ---
+            let appData = {
+                appName: document.getElementById('appName').value,
+                shortDescription: shortDescription.value,
+                longDescription: longDescription.value,
+                appCategory: document.getElementById('appCategory').value,
+                distributionMethod: document.querySelector('input[name="distributionMethod"]:checked').value,
+                websiteUrl: websiteUrlInput.value,
+                apkUrl: '', // Will be filled if APK is uploaded
+                developerName: document.getElementById('developerName').value,
+                developerEmail: document.getElementById('developerEmail').value,
+                submissionDate: new Date().toISOString(), // Appwrite uses ISO strings for datetime
+                status: 'Pending', // Initial status
+                appLogoUrl: '', // Will be filled after upload
+                appImageUrls: [] // Will be filled after uploads
+            };
+
+            const appLogoFile = appLogoInput.files[0];
+            const apkFile = apkFileInput.files[0];
+
+            try {
+                // Upload App Logo
+                if (appLogoFile) {
+                    appData.appLogoUrl = await uploadFileToS3Archive(appLogoFile);
+                }
+
+                // Upload App Images
+                appData.appImageUrls = [];
+                for (const imageFile of uploadedImages) {
+                    const imageUrl = await uploadFileToS3Archive(imageFile);
+                    appData.appImageUrls.push(imageUrl);
+                }
+
+                // Upload APK if distribution method is APK
+                if (appData.distributionMethod === 'apk' && apkFile) {
+                    appData.apkUrl = await uploadFileToS3Archive(apkFile);
+                }
+
+                // --- Store app data in Appwrite ---
+                console.log('Storing app data in Appwrite...');
+                const doc = await databases.createDocument(
+                    DATABASE_ID,
+                    COLLECTION_ID,
+                    ID.unique(), // Corrected: Using ID.unique() directly
+                    appData
+                );
+                console.log("Appwrite document created:", doc);
+                appData.$id = doc.$id; // Store the Appwrite document ID
+
+
+                // Simulate opening email client with pre-filled details
+                const subject = encodeURIComponent(`App Submission Request: ${appData.appName}`);
+                const body = encodeURIComponent(`Dear ${appData.developerName},\n\nThank you for submitting your app "${appData.appName}" to LoomStore. Your application is now pending review.\n\nSubmission ID: ${appData.$id}\nDeveloper Email: ${appData.developerEmail}\nApp Category: ${appData.appCategory}\n\nWe will notify you of the review status within 3-5 business days.\n\nSincerely,\nThe LoomStore Team`);
+                window.location.href = `mailto:${appData.developerEmail}?subject=${subject}&body=${body}`;
+
+
+                showGeneralMessageBox('Submission Successful!', 'Your app has been submitted for review. An email with submission details has been prepared for you. We will notify you of the review status.');
+                developerModal.style.display = 'none'; // Close modal on success
+                document.body.style.overflow = '';
+                appSubmissionForm.reset(); // Reset form fields
+                resetFormErrors(); // Clear validation errors
+                clearPreviews(); // Clear image previews
+
+            } catch (error) {
+                console.error('Submission error:', error);
+                showGeneralMessageBox('Submission Failed', `There was an error submitting your app: ${error.message}. Please try again.`);
             }
+        });
+    }
 
-            // --- Store app data in Appwrite ---
-            console.log('Storing app data in Appwrite...');
-            const doc = await databases.createDocument(
-                DATABASE_ID,
-                COLLECTION_ID,
-                Appwrite.ID.unique(), // Use Appwrite's ID.unique() for document ID
-                appData
-            );
-            console.log("Appwrite document created:", doc);
-            appData.$id = doc.$id; // Store the Appwrite document ID
-
-
-            // Simulate opening email client with pre-filled details
-            const subject = encodeURIComponent(`App Submission Request: ${appData.appName}`);
-            const body = encodeURIComponent(`Dear ${appData.developerName},\n\nThank you for submitting your app "${appData.appName}" to LoomStore. Your application is now pending review.\n\nSubmission ID: ${appData.$id}\nDeveloper Email: ${appData.developerEmail}\nApp Category: ${appData.appCategory}\n\nWe will notify you of the review status within 3-5 business days.\n\nSincerely,\nThe LoomStore Team`);
-            window.location.href = `mailto:${appData.developerEmail}?subject=${subject}&body=${body}`;
-
-
-            showGeneralMessageBox('Submission Successful!', 'Your app has been submitted for review. An email with submission details has been prepared for you. We will notify you of the review status.');
-            developerModal.style.display = 'none'; // Close modal on success
-            document.body.style.overflow = '';
-            appSubmissionForm.reset(); // Reset form fields
-            resetFormErrors(); // Clear validation errors
-            clearPreviews(); // Clear image previews
-
-        } catch (error) {
-            console.error('Submission error:', error);
-            showGeneralMessageBox('Submission Failed', `There was an error submitting your app: ${error.message}. Please try again.`);
-        }
-    });
 
     // Helper functions for validation
     function validateField(inputElement, errorElement, errorMessage, condition) {
@@ -559,9 +591,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         appLogoPreview.innerHTML = '';
         appImagesPreviewContainer.innerHTML = '';
         uploadedImages = []; // Reset array
-        appLogoInput.value = ''; // Clear file input value
-        appImagesInput.value = ''; // Clear file input value
-        apkFileInput.value = ''; // Clear file input value
+        if(appLogoInput) appLogoInput.value = ''; // Clear file input value
+        if(appImagesInput) appImagesInput.value = ''; // Clear file input value
+        if(apkFileInput) apkFileInput.value = ''; // Clear file input value
     }
 
     // --- Mobile Developer Button (Existing, now opens modal) ---
@@ -619,7 +651,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Simulate APK download
                 showGeneralMessageBox('Downloading App', `Downloading ${appName}... (Simulated from: ${apkUrl})`);
                 // In a real scenario, you'd trigger a download:
-                // window.open(apkUrl, '_blank');
+                window.open(apkUrl, '_blank'); // Open in new tab to trigger download
             } else if (distributionMethod === 'url' && websiteUrl) {
                 // Open website URL
                 showGeneralMessageBox('Opening Website', `Opening website for ${appName}...`);
@@ -694,14 +726,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                     [Query.equal('status', 'Approved'), Query.orderDesc('submissionDate')]
                 );
             } else {
-                // Search by app name or short description
+                // Search by app name or short description using OR query if supported or multiple queries
+                // Appwrite's Query.search acts as an OR across specified attributes if used multiple times
+                // or you can explicitly use Query.or() with multiple search queries for each field if needed.
                 response = await databases.listDocuments(
                     DATABASE_ID,
                     COLLECTION_ID,
                     [
                         Query.equal('status', 'Approved'),
-                        Query.search('appName', query), // Search in appName
-                        Query.search('shortDescription', query), // Search in shortDescription
+                        Query.or([
+                            Query.search('appName', query),
+                            Query.search('shortDescription', query)
+                        ]),
                         Query.orderDesc('submissionDate')
                     ]
                 );
@@ -721,14 +757,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    mainSearchButton.addEventListener('click', () => {
-        performAppSearch(mainSearchBar.value);
-    });
-
-    mainSearchBar.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
+    if (mainSearchButton) {
+        mainSearchButton.addEventListener('click', () => {
             performAppSearch(mainSearchBar.value);
-        }
-    });
+        });
+    }
 
+    if (mainSearchBar) {
+        mainSearchBar.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performAppSearch(mainSearchBar.value);
+            }
+        });
+    }
 });
