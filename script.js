@@ -70,4 +70,20 @@ document.addEventListener('DOMContentLoaded', () => {
              alert('Welcome, Developer! (This is a placeholder for a future page.)');
         });
     }
+
+    // --- Secret URL functionality for /console ---
+    // Check if the current URL path is '/console'
+    if (window.location.pathname === '/console') {
+        // Prevent the main page from loading if we're meant to be in the console context
+        document.body.style.display = 'none'; // Hide the main content
+
+        // Open a new popup window for the console
+        // 'console.html' is the page that will load in the new window
+        // The parameters control the size and features of the popup window
+        window.open('console.html', 'LoomStoreDeveloperConsole', 'width=800,height=600,resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no,location=no');
+
+        // After opening the popup, optionally redirect the main window back to the homepage
+        // This ensures the main tab doesn't just sit on a blank /console page
+        window.location.href = '/';
+    }
 });
