@@ -1,5 +1,85 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // --- Mobile Menu Logic (Existing) ---
+// Appwrite SDK Client and Database initialization
+import { Client, Databases, Query } from 'https://cdn.jsdelivr.net/npm/appwrite@11.0.0/dist/esm/sdk.js';
+
+// --- Appwrite Configuration ---
+const APPWRITE_ENDPOINT = 'https://cloud.appwrite.io/v1'; // Your Appwrite Endpoint
+const APPWRITE_PROJECT_ID = '68528057001314063369'; // Your Appwrite Project ID
+const DATABASE_ID = '6852a77b0029f40ae7a4'; // Your Appwrite Database ID
+const COLLECTION_ID = '6852a7a3001e4713b6f6'; // Your Appwrite Collection ID for app submissions
+
+const client = new Client();
+client
+    .setEndpoint(APPWRITE_ENDPOINT)
+    .setProject(APPWRITE_PROJECT_ID);
+
+const databases = new Databases(client);
+
+// --- S3/Archive.org API Configuration (SIMULATED FOR CLIENT-SIDE SAFETY) ---
+// WARNING: Storing these directly in client-side code is a SECURITY RISK.
+// In a real application, handle uploads via a secure backend.
+const S3_ARCHIVE_ACCESS_KEY = 'cFDtuIpumfXlW76M';
+const S3_ARCHIVE_SECRET_KEY = 'NVbTrPoAOnJYzeMJ'; // This is the secret part
+// The 'LOW' prefix with a combined key suggests an Archive.org specific format:
+const S3_ARCHIVE_AUTH_HEADER_VALUE = `LOW ${S3_ARCHIVE_ACCESS_KEY}:${S3_ARCHIVE_SECRET_KEY}`;
+
+// Placeholder URL for simulated Archive.org uploads.
+// In a real Archive.org setup, this would point to a specific collection/item.
+const SIMULATED_ARCHIVE_ORG_UPLOAD_BASE_URL = 'https://s3.us.archive.org/your-collection-name/simulated-item-id';
+
+/**
+ * Simulates file upload to S3/Archive.org.
+ * In a real scenario, this would be handled by a secure backend that generates
+ * pre-signed URLs or directly uploads using the secret key.
+ *
+ * @param {File} file The file to upload.
+ * @returns {Promise<string>} A promise that resolves with the simulated public URL of the uploaded file.
+ */
+async function uploadFileToS3Archive(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    // Archive.org's S3-like API usually requires an 'identifier' for the item
+    // and the files are uploaded within that item. This is a very simplified simulation.
+    formData.append('name', file.name); // Common for some APIs
+
+    try {
+        console.log(`Simulating upload for file: ${file.name}`);
+        // This fetch call is a simulation. It won't actually upload to archive.org directly from here
+        // due to CORS, pre-flight requests, and the need for a proper item identifier.
+        // It's meant to represent the *attempt* to upload.
+        const response = await fetch(SIMULATED_ARCHIVE_ORG_UPLOAD_BASE_URL, {
+            method: 'POST',
+            // For actual Archive.org IAS3, authentication is done in headers like this:
+            headers: {
+                 'Authorization': S3_ARCHIVE_AUTH_HEADER_VALUE,
+                 // Content-Type for FormData is usually automatically set by the browser.
+            },
+            body: formData,
+        });
+
+        // Simulate success regardless of actual network response for the placeholder URL
+        // In a real app, you would check response.ok and parse actual results.
+        if (response.ok) {
+            const result = await response.json(); // Attempt to parse if response is JSON
+            console.log("Simulated S3/Archive.org upload response:", result);
+        } else {
+            // Log error but proceed with simulated URL for client-side demo
+            console.warn(`Simulated S3/Archive.org upload to placeholder URL failed with status ${response.status}. Continuing with simulated URL.`);
+        }
+
+        // Generate a plausible-looking simulated URL for the file
+        const simulatedFileUrl = `${SIMULATED_ARCHIVE_ORG_UPLOAD_BASE_URL}/${file.name.replace(/\s/g, '_')}_${Date.now()}`;
+        console.log(`Simulated file URL: ${simulatedFileUrl}`);
+        return simulatedFileUrl;
+
+    } catch (error) {
+        console.error("Error during simulated file upload:", error);
+        // Fallback to a generic placeholder URL on error
+        return `https://placehold.co/150x150/FF0000/FFFFFF?text=Upload+Failed`;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // --- Mobile Menu Logic --- (Unchanged from previous versions)
     const mobileMenuIcon = document.querySelector('.mobile-menu-icon');
     const mobileNavOverlay = document.createElement('div');
     mobileNavOverlay.classList.add('mobile-nav-overlay');
@@ -45,6 +125,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- General Message Box for Index Page ---
+    const generalMessageBoxContainer = document.getElementById('generalMessageBoxContainer');
+    const generalMessageBoxTitle = document.getElementById('generalMessageBoxTitle');
+    const generalMessageBoxMessage = document.getElementById('generalMessageBoxMessage');
+    const generalOkButton = document.querySelector('.general-ok-button');
+
+    function showGeneralMessageBox(title, message) {
+        generalMessageBoxTitle.textContent = title;
+        generalMessageBoxMessage.textContent = message;
+        generalMessageBoxContainer.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Prevent body scroll
+    }
+
+    generalOkButton.addEventListener('click', () => {
+        generalMessageBoxContainer.style.display = 'none';
+        document.body.style.overflow = ''; // Restore body scroll
+    });
+
+
     // --- Developer Modal Logic ---
     const developerButton = document.querySelector('.developer-btn');
     const developerModal = document.getElementById('developerModal');
@@ -78,26 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const developerNameError = document.getElementById('developerNameError');
     const developerEmailError = document.getElementById('developerEmailError');
 
-
-    // Function to show custom message box
-    function showMessageBox(title, message) {
-        const messageBoxContainer = document.createElement('div');
-        messageBoxContainer.classList.add('message-box-container');
-        messageBoxContainer.innerHTML = `
-            <div class="message-box">
-                <h3>${title}</h3>
-                <p>${message}</p>
-                <button class="ok-button">OK</button>
-            </div>
-        `;
-        document.body.appendChild(messageBoxContainer);
-        messageBoxContainer.style.display = 'flex'; // Show it
-
-        const okButton = messageBoxContainer.querySelector('.ok-button');
-        okButton.addEventListener('click', () => {
-            document.body.removeChild(messageBoxContainer);
-        });
-    }
 
     // Open Modal
     if (developerButton) {
@@ -150,7 +229,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 img.onload = () => {
                     // Check if image is square
                     if (img.width === img.height) {
-                        appLogoPreview.appendChild(img);
+                        const existingImg = appLogoPreview.querySelector('img');
+                        if (existingImg) appLogoPreview.removeChild(existingImg); // Remove previous image
+                        const newImg = document.createElement('img');
+                        newImg.src = e.target.result;
+                        appLogoPreview.appendChild(newImg);
                     } else {
                         appLogoInput.value = ''; // Clear input
                         appLogoPreview.innerHTML = '';
@@ -165,11 +248,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Image Preview for App Screenshots (16:9 or 9:16)
-    const uploadedImages = []; // Store validated images for submission later
+    let uploadedImages = []; // Store validated images for submission later
     appImagesInput.addEventListener('change', (event) => {
         appImagesPreviewContainer.innerHTML = ''; // Clear previous previews
         appImagesError.style.display = 'none'; // Hide error
-        uploadedImages.length = 0; // Clear previous uploaded images
+        uploadedImages = []; // Clear previous uploaded images
 
         const files = Array.from(event.target.files);
 
@@ -180,13 +263,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        let validCount = 0;
+        let processingCount = 0;
         files.forEach(file => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    // Check aspect ratio (allowing for small floating point inaccuracies)
+                    processingCount++;
                     const aspectRatio = img.width / img.height;
                     const is16_9 = Math.abs(aspectRatio - (16 / 9)) < 0.01;
                     const is9_16 = Math.abs(aspectRatio - (9 / 16)) < 0.01;
@@ -205,10 +288,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         removeButton.classList.add('remove-image');
                         removeButton.innerHTML = '&times;';
                         removeButton.addEventListener('click', () => {
-                            uploadedImages.splice(uploadedImages.indexOf(file), 1); // Remove from array
+                            const indexToRemove = uploadedImages.indexOf(file);
+                            if (indexToRemove > -1) {
+                                uploadedImages.splice(indexToRemove, 1); // Remove from array
+                            }
                             previewItem.remove(); // Remove from DOM
                             // Re-validate count after removal
-                            if (uploadedImages.length < 2) {
+                            if (uploadedImages.length < 2 && appImagesInput.files.length > 0) { // Only show error if user initially selected files
                                 appImagesError.textContent = 'Minimum 2 screenshots required.';
                                 appImagesError.style.display = 'block';
                             } else {
@@ -218,23 +304,27 @@ document.addEventListener('DOMContentLoaded', () => {
                         previewItem.appendChild(removeButton);
                         appImagesPreviewContainer.appendChild(previewItem);
                         uploadedImages.push(file); // Add to array only if valid
-                        validCount++;
                     } else {
-                        showMessageBox('Invalid Image Aspect Ratio', `Image '${file.name}' has an invalid aspect ratio. Please upload 16:9 or 9:16 images.`);
-                        appImagesInput.value = ''; // Clear input if any invalid image
-                        appImagesPreviewContainer.innerHTML = ''; // Clear all previews if one is invalid
-                        uploadedImages.length = 0; // Clear array
+                        // If any image is invalid, clear all and show error
+                        showGeneralMessageBox('Invalid Image Aspect Ratio', `Image '${file.name}' has an invalid aspect ratio. Please upload 16:9 or 9:16 images.`);
+                        appImagesInput.value = '';
+                        appImagesPreviewContainer.innerHTML = '';
+                        uploadedImages = [];
+                        appImagesError.textContent = 'One or more images have an invalid aspect ratio.';
+                        appImagesError.style.display = 'block';
                     }
 
-                    // After all files are processed, check the count again
-                    if (validCount > 0 && validCount < 2) {
-                        appImagesError.textContent = 'Minimum 2 screenshots required.';
-                        appImagesError.style.display = 'block';
-                    } else if (validCount > 5) {
-                         appImagesError.textContent = 'Maximum 5 screenshots allowed.';
-                         appImagesError.style.display = 'block';
-                    } else if (validCount >= 2 && validCount <= 5) {
-                        appImagesError.style.display = 'none';
+                    // After all selected files are processed, check the final count
+                    if (processingCount === files.length) {
+                        if (uploadedImages.length < 2) {
+                            appImagesError.textContent = 'Minimum 2 screenshots required.';
+                            appImagesError.style.display = 'block';
+                        } else if (uploadedImages.length > 5) {
+                             appImagesError.textContent = 'Maximum 5 screenshots allowed.';
+                             appImagesError.style.display = 'block';
+                        } else {
+                            appImagesError.style.display = 'none';
+                        }
                     }
                 };
                 img.src = e.target.result;
@@ -242,6 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.readAsDataURL(file);
         });
     });
+
 
     // Handle distribution method change
     distributeUrlRadio.addEventListener('change', () => {
@@ -337,7 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 apkFileError.textContent = 'Please upload an APK file.';
                 apkFileError.style.display = 'block';
                 isValid = false;
-            } else if (apkFileInput.files[0].type !== 'application/vnd.android.package-archive') {
+            } else if (apkFileInput.files[0].type !== 'application/vnd.android.package-archive' && apkFileInput.files[0].name.split('.').pop().toLowerCase() !== 'apk') {
                 apkFileError.textContent = 'Only .apk files are allowed.';
                 apkFileError.style.display = 'block';
                 isValid = false;
@@ -358,122 +449,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         if (!isValid) {
-            showMessageBox('Submission Failed', 'Please correct the errors in the form.');
+            showGeneralMessageBox('Submission Failed', 'Please correct the errors in the form.');
             return;
         }
 
-        // --- Simulated API Calls ---
-        const appData = {
+        // --- Prepare Data for Appwrite and Simulated File Uploads ---
+        let appData = {
             appName: document.getElementById('appName').value,
             shortDescription: shortDescription.value,
             longDescription: longDescription.value,
             appCategory: document.getElementById('appCategory').value,
             distributionMethod: document.querySelector('input[name="distributionMethod"]:checked').value,
             websiteUrl: websiteUrlInput.value,
+            apkUrl: '', // Will be filled if APK is uploaded
             developerName: document.getElementById('developerName').value,
             developerEmail: document.getElementById('developerEmail').value,
-            submissionDate: new Date().toISOString()
+            submissionDate: new Date().toISOString(), // Appwrite uses ISO strings for datetime
+            status: 'Pending', // Initial status
+            appLogoUrl: '', // Will be filled after upload
+            appImageUrls: [] // Will be filled after uploads
         };
 
         const appLogoFile = appLogoInput.files[0];
         const apkFile = apkFileInput.files[0];
 
         try {
-            // Simulate S3/Archive.org API upload for APK (if chosen) and images
-            if (appData.distributionMethod === 'apk' && apkFile) {
-                const formDataApk = new FormData();
-                formDataApk.append('file', apkFile); // 'file' is common field name for uploads
-
-                console.log('Simulating APK upload to S3/Archive.org API...');
-                // Replace with your actual S3/Archive.org upload endpoint
-                const s3UploadResponse = await fetch('https://api.archive.org/upload/your-bucket', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'LOW t1neWUa7JnuqGiMv:sLBddyAy31lVj4pR',
-                        // Content-Type will be 'multipart/form-data' automatically with FormData
-                    },
-                    body: formDataApk
-                });
-                const s3Result = await s3UploadResponse.json();
-                console.log('Simulated S3/Archive.org APK upload result:', s3Result);
-                // In a real scenario, you'd get a URL to the uploaded APK here
-                appData.apkUrl = `https://archive.org/download/${s3Result.key || 'simulated-apk-key'}/${apkFile.name}`;
-            }
-
-            // Simulate S3/Archive.org API upload for App Logo
+            // Upload App Logo
             if (appLogoFile) {
-                const formDataLogo = new FormData();
-                formDataLogo.append('file', appLogoFile);
-                console.log('Simulating App Logo upload to S3/Archive.org API...');
-                const s3LogoResponse = await fetch('https://api.archive.org/upload/your-bucket-logos', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'LOW t1neWUa7JnuqGiMv:sLBddyAy31lVj4pR',
-                    },
-                    body: formDataLogo
-                });
-                const s3LogoResult = await s3LogoResponse.json();
-                console.log('Simulated S3/Archive.org Logo upload result:', s3LogoResult);
-                appData.appLogoUrl = `https://archive.org/download/${s3LogoResult.key || 'simulated-logo-key'}/${appLogoFile.name}`;
+                appData.appLogoUrl = await uploadFileToS3Archive(appLogoFile);
             }
 
-            // Simulate S3/Archive.org API upload for App Images
+            // Upload App Images
             appData.appImageUrls = [];
             for (const imageFile of uploadedImages) {
-                const formDataImage = new FormData();
-                formDataImage.append('file', imageFile);
-                console.log(`Simulating App Image '${imageFile.name}' upload to S3/Archive.org API...`);
-                const s3ImageResponse = await fetch('https://api.archive.org/upload/your-bucket-images', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'LOW t1neWUa7JnuqGiMv:sLBddyAy31lVj4pR',
-                    },
-                    body: formDataImage
-                });
-                const s3ImageResult = await s3ImageResponse.json();
-                console.log(`Simulated S3/Archive.org Image upload result for '${imageFile.name}':`, s3ImageResult);
-                appData.appImageUrls.push(`https://archive.org/download/${s3ImageResult.key || 'simulated-image-key'}/${imageFile.name}`);
+                const imageUrl = await uploadFileToS3Archive(imageFile);
+                appData.appImageUrls.push(imageUrl);
             }
 
-            // Simulate Appwrite metadata storage
-            console.log('Simulating Appwrite metadata storage...');
-            // Replace with your actual Appwrite API endpoint and project/collection IDs
-            const appwriteResponse = await fetch('https://[YOUR_APPWRITE_ENDPOINT]/v1/databases/[DATABASE_ID]/collections/[COLLECTION_ID]/documents', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Appwrite-Project': '[YOUR_APPWRITE_PROJECT_ID]',
-                    'X-Appwrite-Key': '[YOUR_APPWRITE_API_KEY]' // Use a server-side key or set up policies
-                },
-                body: JSON.stringify(appData)
-            });
-            const appwriteResult = await appwriteResponse.json();
-            console.log('Simulated Appwrite metadata storage result:', appwriteResult);
+            // Upload APK if distribution method is APK
+            if (appData.distributionMethod === 'apk' && apkFile) {
+                appData.apkUrl = await uploadFileToS3Archive(apkFile);
+            }
 
-            // Simulate sending app release request to console page (via a placeholder API)
-            console.log('Simulating sending app release request to console page...');
-            const consoleRequestResponse = await fetch('https://your-console-backend.com/api/app-requests', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    appName: appData.appName,
-                    developerName: appData.developerName,
-                    developerEmail: appData.developerEmail,
-                    status: 'Pending Review',
-                    // Include any relevant data for your backend console
-                })
-            });
-            const consoleRequestResult = await consoleRequestResponse.json();
-            console.log('Simulated console request result:', consoleRequestResult);
+            // --- Store app data in Appwrite ---
+            console.log('Storing app data in Appwrite...');
+            const doc = await databases.createDocument(
+                DATABASE_ID,
+                COLLECTION_ID,
+                Appwrite.ID.unique(), // Use Appwrite's ID.unique() for document ID
+                appData
+            );
+            console.log("Appwrite document created:", doc);
+            appData.$id = doc.$id; // Store the Appwrite document ID
+
 
             // Simulate opening email client with pre-filled details
             const subject = encodeURIComponent(`App Submission Request: ${appData.appName}`);
-            const body = encodeURIComponent(`Dear LoomStore Team,\n\nI have submitted my app "${appData.appName}" for review.\n\nDeveloper Name: ${appData.developerName}\nDeveloper Email: ${appData.developerEmail}\nApp Category: ${appData.appCategory}\n\nShort Description: ${appData.shortDescription}\n\nFull Description: ${appData.longDescription}\n\n${appData.distributionMethod === 'url' ? `Website URL: ${appData.websiteUrl}` : `APK File Uploaded (simulated URL: ${appData.apkUrl})`}\n\nThank you for your time.\n\nSincerely,\n${appData.developerName}`);
-            // This will attempt to open the user's default email client
+            const body = encodeURIComponent(`Dear ${appData.developerName},\n\nThank you for submitting your app "${appData.appName}" to LoomStore. Your application is now pending review.\n\nSubmission ID: ${appData.$id}\nDeveloper Email: ${appData.developerEmail}\nApp Category: ${appData.appCategory}\n\nWe will notify you of the review status within 3-5 business days.\n\nSincerely,\nThe LoomStore Team`);
             window.location.href = `mailto:${appData.developerEmail}?subject=${subject}&body=${body}`;
 
 
-            showMessageBox('Submission Successful!', 'Your app has been submitted for review. An email with submission details has been prepared for you. We will notify you of the review status.');
+            showGeneralMessageBox('Submission Successful!', 'Your app has been submitted for review. An email with submission details has been prepared for you. We will notify you of the review status.');
             developerModal.style.display = 'none'; // Close modal on success
             document.body.style.overflow = '';
             appSubmissionForm.reset(); // Reset form fields
@@ -482,7 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('Submission error:', error);
-            showMessageBox('Submission Failed', `There was an error submitting your app: ${error.message}. Please try again.`);
+            showGeneralMessageBox('Submission Failed', `There was an error submitting your app: ${error.message}. Please try again.`);
         }
     });
 
@@ -522,7 +558,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function clearPreviews() {
         appLogoPreview.innerHTML = '';
         appImagesPreviewContainer.innerHTML = '';
-        uploadedImages.length = 0; // Clear the array storing image files
+        uploadedImages = []; // Reset array
         appLogoInput.value = ''; // Clear file input value
         appImagesInput.value = ''; // Clear file input value
         apkFileInput.value = ''; // Clear file input value
@@ -541,7 +577,158 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Secret URL functionality for /console.html (Existing) ---
     if (window.location.pathname.endsWith('/console.html')) {
         document.body.style.display = 'none';
-        window.open('console.html', 'LoomStoreDeveloperConsole', 'width=800,height=600,resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no,location=no');
+        window.open('console.html', 'LoomStoreDeveloperConsole', 'width=1200,height=800,resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no,location=no'); // Increased size
         window.location.href = '/';
     }
+
+
+    // --- Display Approved Apps on Main LoomStore Page ---
+    const approvedAppsGrid = document.getElementById('approvedAppsGrid');
+
+    /**
+     * Creates an app card HTML element for display on the main LoomStore page.
+     * @param {Object} app - The app data object from Appwrite.
+     * @returns {HTMLElement} The created app card element.
+     */
+    function createAppDisplayCard(app) {
+        const card = document.createElement('div');
+        card.classList.add('app-card'); // Use the existing .app-card style
+
+        card.innerHTML = `
+            <div class="app-icon">
+                <img src="${app.appLogoUrl || 'https://placehold.co/80x80/007bff/ffffff?text=APP'}" alt="${app.appName} Logo" onerror="this.onerror=null;this.src='https://placehold.co/80x80/007bff/ffffff?text=APP';" />
+            </div>
+            <h4>${app.appName}</h4>
+            <p class="app-category">${app.appCategory}</p>
+            <p class="app-description">${app.shortDescription}</p>
+            <div class="app-rating">
+                <i class="fas fa-star"></i> 4.5 <!-- Static rating for now -->
+            </div>
+            <button class="get-btn" data-app-id="${app.$id}" data-app-name="${app.appName}" data-apk-url="${app.apkUrl}" data-website-url="${app.websiteUrl}" data-distribution-method="${app.distributionMethod}">Get</button>
+        `;
+
+        // Add event listener for the "Get" button
+        card.querySelector('.get-btn').addEventListener('click', (e) => {
+            const appId = e.target.dataset.appId;
+            const appName = e.target.dataset.appName;
+            const apkUrl = e.target.dataset.apkUrl;
+            const websiteUrl = e.target.dataset.websiteUrl;
+            const distributionMethod = e.target.dataset.distributionMethod;
+
+            if (distributionMethod === 'apk' && apkUrl) {
+                // Simulate APK download
+                showGeneralMessageBox('Downloading App', `Downloading ${appName}... (Simulated from: ${apkUrl})`);
+                // In a real scenario, you'd trigger a download:
+                // window.open(apkUrl, '_blank');
+            } else if (distributionMethod === 'url' && websiteUrl) {
+                // Open website URL
+                showGeneralMessageBox('Opening Website', `Opening website for ${appName}...`);
+                window.open(websiteUrl, '_blank');
+            } else {
+                showGeneralMessageBox('Error', 'App download/install method not available.');
+            }
+        });
+
+        return card;
+    }
+
+    /**
+     * Fetches approved apps from Appwrite and displays them.
+     */
+    async function fetchAndDisplayApprovedApps() {
+        try {
+            console.log("Fetching approved apps from Appwrite...");
+            const response = await databases.listDocuments(
+                DATABASE_ID,
+                COLLECTION_ID,
+                [Query.equal('status', 'Approved'), Query.orderDesc('submissionDate')]
+            );
+
+            approvedAppsGrid.innerHTML = ''; // Clear loading message/previous apps
+
+            if (response.documents.length === 0) {
+                approvedAppsGrid.innerHTML = '<p class="no-apps-message">No approved apps found yet.</p>';
+            } else {
+                response.documents.forEach(app => {
+                    approvedAppsGrid.appendChild(createAppDisplayCard(app));
+                });
+            }
+            console.log("Approved apps displayed:", response.documents.length);
+
+        } catch (error) {
+            console.error("Error fetching approved apps:", error);
+            approvedAppsGrid.innerHTML = '<p class="no-apps-message error">Failed to load apps. Please try again later.</p>';
+            showGeneralMessageBox('Error Loading Apps', 'Failed to retrieve approved applications. Please check your internet connection or try again later.');
+        }
+    }
+
+    // Call this function when the page loads to populate the app grid
+    fetchAndDisplayApprovedApps();
+
+    // Appwrite Realtime Subscription for Approved Apps Grid
+    client.subscribe(`databases.${DATABASE_ID}.collections.${COLLECTION_ID}.documents`, response => {
+        // Only react to updates within our specific collection and if the payload has a status
+        if (response.events.some(event => event.startsWith(`databases.${DATABASE_ID}.collections.${COLLECTION_ID}.documents.`))) {
+            const updatedApp = response.payload;
+            // If an app's status changes to Approved, or an Approved app is updated/deleted, refresh the list
+            if (updatedApp && (updatedApp.status === 'Approved' || response.events.includes('database.documents.delete'))) {
+                console.log("Realtime update for approved apps received, refreshing grid.");
+                fetchAndDisplayApprovedApps();
+            }
+        }
+    });
+
+    // --- Main Search Bar functionality ---
+    const mainSearchBar = document.getElementById('mainSearchBar');
+    const mainSearchButton = document.getElementById('mainSearchButton');
+
+    async function performAppSearch(query) {
+        approvedAppsGrid.innerHTML = '<p class="no-apps-message">Searching for apps...</p>';
+        try {
+            let response;
+            if (query.trim() === '') {
+                // If search bar is empty, show all approved apps
+                response = await databases.listDocuments(
+                    DATABASE_ID,
+                    COLLECTION_ID,
+                    [Query.equal('status', 'Approved'), Query.orderDesc('submissionDate')]
+                );
+            } else {
+                // Search by app name or short description
+                response = await databases.listDocuments(
+                    DATABASE_ID,
+                    COLLECTION_ID,
+                    [
+                        Query.equal('status', 'Approved'),
+                        Query.search('appName', query), // Search in appName
+                        Query.search('shortDescription', query), // Search in shortDescription
+                        Query.orderDesc('submissionDate')
+                    ]
+                );
+            }
+
+            approvedAppsGrid.innerHTML = '';
+            if (response.documents.length === 0) {
+                approvedAppsGrid.innerHTML = `<p class="no-apps-message">No approved apps found for "${query}".</p>`;
+            } else {
+                response.documents.forEach(app => {
+                    approvedAppsGrid.appendChild(createAppDisplayCard(app));
+                });
+            }
+        } catch (error) {
+            console.error("Error during app search:", error);
+            approvedAppsGrid.innerHTML = '<p class="no-apps-message error">Error performing search.</p>';
+        }
+    }
+
+    mainSearchButton.addEventListener('click', () => {
+        performAppSearch(mainSearchBar.value);
+    });
+
+    mainSearchBar.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            performAppSearch(mainSearchBar.value);
+        }
+    });
+
 });
