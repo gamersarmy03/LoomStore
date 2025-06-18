@@ -150,7 +150,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- Developer Modal Logic ---
     const developerButton = document.querySelector('.developer-btn');
     const developerModal = document.getElementById('developerModal');
-    const modalCloseButton = developerModal.querySelector('.close-button');
+    // Add logs to check if elements are found
+    console.log("Attempting to find elements for Developer Modal...");
+    console.log("developerButton:", developerButton);
+    console.log("developerModal:", developerModal);
+
+
+    const modalCloseButton = developerModal ? developerModal.querySelector('.close-button') : null;
     const appSubmissionForm = document.getElementById('appSubmissionForm');
     const shortDescription = document.getElementById('shortDescription');
     const longDescription = document.getElementById('longDescription');
@@ -182,28 +188,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
     // Open Modal
-    if (developerButton) {
-        console.log("Developer button found. Adding click listener.");
+    if (developerButton && developerModal) { // Ensure both elements are found before adding listener
+        console.log("Developer button and modal found. Adding click listener.");
         developerButton.addEventListener('click', () => {
             console.log("Developer button clicked!");
-            if (developerModal) {
-                developerModal.style.display = 'flex'; // Use flex to center
-                document.body.style.overflow = 'hidden'; // Prevent scrolling body
-                console.log("Developer modal should be visible now.");
-            } else {
-                console.error("Developer modal element not found!");
-            }
+            developerModal.style.display = 'flex'; // Use flex to center
+            document.body.style.overflow = 'hidden'; // Prevent scrolling body
+            console.log("Developer modal should be visible now. Checking display style:", developerModal.style.display);
         });
     } else {
-        console.error("Developer button element not found!");
+        console.error("Critical: Developer button or modal element not found. Modal will not open.");
     }
 
     // Close Modal
-    if (modalCloseButton) {
+    if (modalCloseButton && developerModal) {
         modalCloseButton.addEventListener('click', () => {
             developerModal.style.display = 'none';
             document.body.style.overflow = ''; // Restore body scrolling
-            appSubmissionForm.reset(); // Reset form fields
+            if (appSubmissionForm) appSubmissionForm.reset(); // Reset form fields safely
             resetFormErrors(); // Clear validation errors
             clearPreviews(); // Clear image previews
             console.log("Developer modal closed.");
@@ -212,26 +214,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
     // Close Modal if clicked outside content
-    window.addEventListener('click', (event) => {
-        if (event.target == developerModal) {
-            developerModal.style.display = 'none';
-            document.body.style.overflow = '';
-            appSubmissionForm.reset();
-            resetFormErrors();
-            clearPreviews();
-            console.log("Developer modal closed by clicking outside.");
-        }
-    });
+    if (developerModal) { // Only add if modal element exists
+        window.addEventListener('click', (event) => {
+            if (event.target === developerModal) { // Strict equality to ensure it's the modal background
+                developerModal.style.display = 'none';
+                document.body.style.overflow = '';
+                if (appSubmissionForm) appSubmissionForm.reset();
+                resetFormErrors();
+                clearPreviews();
+                console.log("Developer modal closed by clicking outside.");
+            }
+        });
+    }
+
 
     // Handle character counts for text areas
-    if (shortDescription) {
+    if (shortDescription && shortDescCharCount) {
         shortDescription.addEventListener('input', () => {
             shortDescCharCount.textContent = `${shortDescription.value.length}/100`;
             validateField(shortDescription, shortDescriptionError, 'Short description cannot be empty.', shortDescription.value.length > 0);
         });
     }
 
-    if (longDescription) {
+    if (longDescription && longDescCharCount) {
         longDescription.addEventListener('input', () => {
             longDescCharCount.textContent = `${longDescription.value.length}/400`;
             validateField(longDescription, longDescriptionError, 'Full description cannot be empty.', longDescription.value.length > 0);
@@ -239,7 +244,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Image Preview for App Logo (Square format)
-    if (appLogoInput) {
+    if (appLogoInput && appLogoPreview && appLogoError) {
         appLogoInput.addEventListener('change', (event) => {
             appLogoPreview.innerHTML = ''; // Clear previous preview
             appLogoError.style.display = 'none'; // Hide error
@@ -273,7 +278,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Image Preview for App Screenshots (16:9 or 9:16)
     let uploadedImages = []; // Store validated images for submission later
-    if (appImagesInput) {
+    if (appImagesInput && appImagesPreviewContainer && appImagesError) {
         appImagesInput.addEventListener('change', (event) => {
             appImagesPreviewContainer.innerHTML = ''; // Clear previous previews
             appImagesError.style.display = 'none'; // Hide error
@@ -365,19 +370,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         distributeUrlRadio.addEventListener('change', () => {
             websiteUrlGroup.style.display = 'block';
             apkUploadGroup.style.display = 'none';
-            websiteUrlInput.setAttribute('required', 'required');
-            apkFileInput.removeAttribute('required');
-            apkFileInput.value = ''; // Clear APK input if switching
-            apkFileError.style.display = 'none'; // Hide error
+            if (websiteUrlInput) websiteUrlInput.setAttribute('required', 'required');
+            if (apkFileInput) apkFileInput.removeAttribute('required');
+            if (apkFileInput) apkFileInput.value = ''; // Clear APK input if switching
+            if (apkFileError) apkFileError.style.display = 'none'; // Hide error
         });
 
         distributeApkRadio.addEventListener('change', () => {
             websiteUrlGroup.style.display = 'none';
             apkUploadGroup.style.display = 'block';
-            apkFileInput.setAttribute('required', 'required');
-            websiteUrlInput.removeAttribute('required');
-            websiteUrlInput.value = ''; // Clear URL input if switching
-            websiteUrlError.style.display = 'none'; // Hide error
+            if (apkFileInput) apkFileInput.setAttribute('required', 'required');
+            if (websiteUrlInput) websiteUrlInput.removeAttribute('required');
+            if (websiteUrlInput) websiteUrlInput.value = ''; // Clear URL input if switching
+            if (websiteUrlError) websiteUrlError.style.display = 'none'; // Hide error
         });
     }
 
@@ -394,7 +399,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             isValid = validateField(document.getElementById('appName'), appNameError, 'App Name cannot be empty.', document.getElementById('appName').value.trim() !== '') && isValid;
 
             // Validation for App Logo
-            if (!appLogoInput.files[0]) {
+            if (!appLogoInput || !appLogoInput.files[0]) {
                 appLogoError.textContent = 'Please upload an app logo.';
                 appLogoError.style.display = 'block';
                 isValid = false;
@@ -423,7 +428,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
             // Validation for App Images
-            if (uploadedImages.length < 2 || uploadedImages.length > 5) {
+            if (!appImagesInput || uploadedImages.length < 2 || uploadedImages.length > 5) {
                 appImagesError.textContent = 'Please upload between 2 and 5 screenshots.';
                 appImagesError.style.display = 'block';
                 isValid = false;
@@ -450,11 +455,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
             // Validation for Distribution Method
-            if (distributeUrlRadio.checked) {
+            if (distributeUrlRadio && distributeUrlRadio.checked) {
                 isValid = validateField(websiteUrlInput, websiteUrlError, 'Website URL cannot be empty.', websiteUrlInput.value.trim() !== '') && isValid;
                 isValid = validateField(websiteUrlInput, websiteUrlError, 'Please enter a valid URL.', isValidUrl(websiteUrlInput.value.trim())) && isValid;
-            } else if (distributeApkRadio.checked) {
-                if (!apkFileInput.files[0]) {
+            } else if (distributeApkRadio && distributeApkRadio.checked) {
+                if (!apkFileInput || !apkFileInput.files[0]) {
                     apkFileError.textContent = 'Please upload an APK file.';
                     apkFileError.style.display = 'block';
                     isValid = false;
@@ -464,8 +469,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     isValid = false;
                 }
             } else {
-                distributionMethodError.textContent = 'Please choose a distribution method.';
-                distributionMethodError.style.display = 'block';
+                if (distributionMethodError) { // Ensure error element exists
+                    distributionMethodError.textContent = 'Please choose a distribution method.';
+                    distributionMethodError.style.display = 'block';
+                }
                 isValid = false;
             }
 
@@ -490,7 +497,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 longDescription: longDescription.value,
                 appCategory: document.getElementById('appCategory').value,
                 distributionMethod: document.querySelector('input[name="distributionMethod"]:checked').value,
-                websiteUrl: websiteUrlInput.value,
+                websiteUrl: websiteUrlInput ? websiteUrlInput.value : '', // Safely get value
                 apkUrl: '', // Will be filled if APK is uploaded
                 developerName: document.getElementById('developerName').value,
                 developerEmail: document.getElementById('developerEmail').value,
@@ -500,8 +507,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 appImageUrls: [] // Will be filled after uploads
             };
 
-            const appLogoFile = appLogoInput.files[0];
-            const apkFile = apkFileInput.files[0];
+            const appLogoFile = appLogoInput ? appLogoInput.files[0] : null;
+            const apkFile = apkFileInput ? apkFileInput.files[0] : null;
 
             try {
                 // Upload App Logo
@@ -540,9 +547,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
                 showGeneralMessageBox('Submission Successful!', 'Your app has been submitted for review. An email with submission details has been prepared for you. We will notify you of the review status.');
-                developerModal.style.display = 'none'; // Close modal on success
+                if (developerModal) developerModal.style.display = 'none'; // Close modal on success
                 document.body.style.overflow = '';
-                appSubmissionForm.reset(); // Reset form fields
+                if (appSubmissionForm) appSubmissionForm.reset(); // Reset form fields
                 resetFormErrors(); // Clear validation errors
                 clearPreviews(); // Clear image previews
 
@@ -556,6 +563,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Helper functions for validation
     function validateField(inputElement, errorElement, errorMessage, condition) {
+        if (!inputElement || !errorElement) return true; // Safely handle if element not found
+
         if (!condition) {
             errorElement.textContent = errorMessage;
             errorElement.style.display = 'block';
@@ -588,8 +597,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function clearPreviews() {
-        appLogoPreview.innerHTML = '';
-        appImagesPreviewContainer.innerHTML = '';
+        if (appLogoPreview) appLogoPreview.innerHTML = '';
+        if (appImagesPreviewContainer) appImagesPreviewContainer.innerHTML = '';
         uploadedImages = []; // Reset array
         if(appLogoInput) appLogoInput.value = ''; // Clear file input value
         if(appImagesInput) appImagesInput.value = ''; // Clear file input value
@@ -598,7 +607,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- Mobile Developer Button (Existing, now opens modal) ---
     const mobileDeveloperButton = mobileNavOverlay.querySelector('.mobile-dev-btn');
-    if (mobileDeveloperButton) {
+    if (mobileDeveloperButton && developerModal) { // Ensure both elements are found
         mobileDeveloperButton.addEventListener('click', () => {
              developerModal.style.display = 'flex';
              document.body.style.overflow = 'hidden';
@@ -668,6 +677,11 @@ document.addEventListener('DOMContentLoaded', async () => {
      * Fetches approved apps from Appwrite and displays them.
      */
     async function fetchAndDisplayApprovedApps() {
+        if (!approvedAppsGrid) {
+            console.error("approvedAppsGrid element not found, cannot display apps.");
+            return;
+        }
+        approvedAppsGrid.innerHTML = '<p class="no-apps-message">Loading approved apps...</p>';
         try {
             console.log("Fetching approved apps from Appwrite...");
             const response = await databases.listDocuments(
@@ -715,6 +729,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const mainSearchButton = document.getElementById('mainSearchButton');
 
     async function performAppSearch(query) {
+        if (!approvedAppsGrid) {
+            console.error("approvedAppsGrid element not found, cannot perform search.");
+            return;
+        }
         approvedAppsGrid.innerHTML = '<p class="no-apps-message">Searching for apps...</p>';
         try {
             let response;
