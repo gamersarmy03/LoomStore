@@ -208,6 +208,108 @@
         </div>
     </footer>
 
+    <!-- Developer Submission Modal -->
+    <div id="developerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Submit Your App to LoomStore</h2>
+            <form id="appSubmissionForm">
+                <div class="form-group">
+                    <label for="appName">App Name:</label>
+                    <input type="text" id="appName" required>
+                    <div class="error-message" id="appNameError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="appLogo">App Logo (Square format, PNG/JPG):</label>
+                    <input type="file" id="appLogo" accept="image/png, image/jpeg" required>
+                    <div class="image-preview" id="appLogoPreview"></div>
+                    <div class="error-message" id="appLogoError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="shortDescription">Short Description (max 100 letters):</label>
+                    <textarea id="shortDescription" maxlength="100" required></textarea>
+                    <div class="char-count" id="shortDescCharCount">0/100</div>
+                    <div class="error-message" id="shortDescriptionError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="longDescription">Full Description (max 400 letters):</label>
+                    <textarea id="longDescription" maxlength="400" required></textarea>
+                    <div class="char-count" id="longDescCharCount">0/400</div>
+                    <div class="error-message" id="longDescriptionError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="appImages">App Screenshots (Min 2, Max 5 images, 16:9 or 9:16 aspect ratio, PNG/JPG):</label>
+                    <input type="file" id="appImages" accept="image/png, image/jpeg" multiple required>
+                    <div class="image-preview-container" id="appImagesPreview"></div>
+                    <div class="error-message" id="appImagesError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="appCategory">Category:</label>
+                    <select id="appCategory" required>
+                        <option value="">-- Select a Category --</option>
+                        <option value="Design">Design & Graphics</option>
+                        <option value="Music">Music & Audio</option>
+                        <option value="Developer">Developer Tools</option>
+                        <option value="Writing">Writing & AI</option>
+                        <option value="Gaming">Gaming</option>
+                        <option value="Health">Health & Fitness</option>
+                        <option value="Video">Video Editing</option>
+                        <option value="Education">Education</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Food">Food & Drink</option>
+                        <option value="Puzzles">Puzzles</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Lifestyle">Lifestyle</option>
+                    </select>
+                    <div class="error-message" id="appCategoryError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>App Distribution:</label>
+                    <div class="radio-group">
+                        <input type="radio" id="distributeUrl" name="distributionMethod" value="url" checked>
+                        <label for="distributeUrl">Provide Website URL</label>
+                        <input type="radio" id="distributeApk" name="distributionMethod" value="apk">
+                        <label for="distributeApk">Upload APK</label>
+                    </div>
+                    <div class="error-message" id="distributionMethodError"></div>
+                </div>
+
+                <div class="form-group" id="websiteUrlGroup">
+                    <label for="websiteUrl">Website URL:</label>
+                    <input type="url" id="websiteUrl" placeholder="https://your-app-website.com" required>
+                    <div class="error-message" id="websiteUrlError"></div>
+                </div>
+
+                <div class="form-group" id="apkUploadGroup" style="display: none;">
+                    <label for="apkFile">Upload APK File:</label>
+                    <input type="file" id="apkFile" accept=".apk" required>
+                    <div class="error-message" id="apkFileError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="developerName">Developer Name (Visible):</label>
+                    <input type="text" id="developerName" required>
+                    <div class="error-message" id="developerNameError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="developerEmail">Developer Email (Private):</label>
+                    <input type="email" id="developerEmail" required>
+                    <div class="error-message" id="developerEmailError"></div>
+                </div>
+
+                <button type="submit" class="submit-btn">Submit App for Review</button>
+            </form>
+        </div>
+    </div>
+    <!-- End Developer Submission Modal -->
+
     <script src="script.js"></script>
 </body>
 </html>
