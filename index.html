@@ -3,243 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LoomStore - Your Creative Hub</title>
+    <title>LoomStore</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Google Fonts - Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Appwrite SDK CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/appwrite@11.0.0/dist/sdk.js"></script>
 </head>
 <body>
-    <header class="navbar">
-        <div class="container">
-            <div class="logo">
-                <h1>LoomStore</h1>
-            </div>
-            <nav class="nav-links">
-                <ul>
-                    <li><a href="#" class="active">Home</a></li>
-                    <li><a href="#">Categories</a></li>
-                    <li><a href="#">About Us</a></li>
-                    <li><a href="#">Support</a></li>
-                </ul>
-            </nav>
-            <div class="header-buttons">
-                <button class="developer-btn">Developer</button>
-                <div class="mobile-menu-icon">
-                    <i class="fas fa-bars"></i>
-                </div>
-            </div>
-        </div>
+    <header>
+        <div class="logo">LoomStore</div>
+        <button id="developer-btn">Developer</button>
     </header>
-
-    <main class="main-content container">
-        <section class="hero-section">
-            <h2>Discover Amazing Apps & Creative Tools</h2>
-            <p>Unleash your potential with LoomStore's curated collection.</p>
-            <div class="search-bar">
-                <input type="text" id="mainSearchBar" placeholder="Search apps, tools, and more...">
-                <button id="mainSearchButton"><i class="fas fa-search"></i></button>
-            </div>
-        </section>
-
-        <section class="app-grid-section">
-            <h3>Featured Apps</h3>
-            <div id="approvedAppsGrid" class="app-grid">
-                <!-- Approved Apps from Appwrite will be loaded here -->
-                <p class="no-apps-message">Loading approved apps...</p>
-            </div>
-        </section>
-
-        <section class="browse-categories">
-            <h3>Browse by Categories</h3>
-            <div class="categories-grid">
-                <a href="#" class="category-card">
-                    <i class="fas fa-palette"></i>
-                    <span>Design</span>
-                </a>
-                <a href="#" class="category-card">
-                    <i class="fas fa-film"></i>
-                    <span>Video Editing</span>
-                </a>
-                <a href="#" class="category-card">
-                    <i class="fas fa-chalkboard-teacher"></i>
-                    <span>Education</span>
-                </a>
-                <a href="#" class="category-card">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Finance</span>
-                </a>
-                <a href="#" class="category-card">
-                    <i class="fas fa-utensils"></i>
-                    <span>Food & Drink</span>
-                </a>
-                <a href="#" class="category-card">
-                    <i class="fas fa-puzzle-piece"></i>
-                    <span>Puzzles</span>
-                </a>
-            </div>
-        </section>
-
+    <main>
+        <h1>Welcome to LoomStore</h1>
+        <p>Discover amazing apps here.</p>
+        <!-- Accepted apps will be displayed here later -->
     </main>
-
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-columns">
-                <div class="footer-col">
-                    <h4>LoomStore</h4>
-                    <ul>
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Careers</a></li>
-                        <li><a href="#">Blog</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Support</h4>
-                    <ul>
-                        <li><a href="#">Help Center</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Developers</h4>
-                    <ul>
-                        <li><a href="#">Developer Portal</a></li>
-                        <li><a href="#">API Documentation</a></li>
-                        <li><a href="#">Submit Your App</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Connect</h4>
-                    <div class="social-icons">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 LoomStore. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Developer Submission Modal -->
-    <div id="developerModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2>Submit Your App to LoomStore</h2>
-            <form id="appSubmissionForm">
-                <div class="form-group">
-                    <label for="appName">App Name:</label>
-                    <input type="text" id="appName" required>
-                    <div class="error-message" id="appNameError"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="appLogo">App Logo (Square format, PNG/JPG):</label>
-                    <input type="file" id="appLogo" accept="image/png, image/jpeg" required>
-                    <div class="image-preview" id="appLogoPreview"></div>
-                    <div class="error-message" id="appLogoError"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="shortDescription">Short Description (max 100 letters):</label>
-                    <textarea id="shortDescription" maxlength="100" required></textarea>
-                    <div class="char-count" id="shortDescCharCount">0/100</div>
-                    <div class="error-message" id="shortDescriptionError"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="longDescription">Full Description (max 400 letters):</label>
-                    <textarea id="longDescription" maxlength="400" required></textarea>
-                    <div class="char-count" id="longDescCharCount">0/400</div>
-                    <div class="error-message" id="longDescriptionError"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="appImages">App Screenshots (Min 2, Max 5 images, 16:9 or 9:16 aspect ratio, PNG/JPG):</label>
-                    <input type="file" id="appImages" accept="image/png, image/jpeg" multiple required>
-                    <div class="image-preview-container" id="appImagesPreview"></div>
-                    <div class="error-message" id="appImagesError"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="appCategory">Category:</label>
-                    <select id="appCategory" required>
-                        <option value="">-- Select a Category --</option>
-                        <option value="Design">Design & Graphics</option>
-                        <option value="Music">Music & Audio</option>
-                        <option value="Developer">Developer Tools</option>
-                        <option value="Writing">Writing & AI</option>
-                        <option value="Gaming">Gaming</option>
-                        <option value="Health">Health & Fitness</option>
-                        <option value="Video">Video Editing</option>
-                        <option value="Education">Education</option>
-                        <option value="Finance">Finance</option>
-                        <option value="Food">Food & Drink</option>
-                        <option value="Puzzles">Puzzles</option>
-                        <option value="Utilities">Utilities</option>
-                        <option value="Lifestyle">Lifestyle</option>
-                    </select>
-                    <div class="error-message" id="appCategoryError"></div>
-                </div>
-
-                <div class="form-group">
-                    <label>App Distribution:</label>
-                    <div class="radio-group">
-                        <input type="radio" id="distributeUrl" name="distributionMethod" value="url" checked>
-                        <label for="distributeUrl">Provide Website URL</label>
-                        <input type="radio" id="distributeApk" name="distributionMethod" value="apk">
-                        <label for="distributeApk">Upload APK</label>
-                    </div>
-                    <div class="error-message" id="distributionMethodError"></div>
-                </div>
-
-                <div class="form-group" id="websiteUrlGroup">
-                    <label for="websiteUrl">Website URL:</label>
-                    <input type="url" id="websiteUrl" placeholder="https://your-app-website.com" required>
-                    <div class="error-message" id="websiteUrlError"></div>
-                </div>
-
-                <div class="form-group" id="apkUploadGroup" style="display: none;">
-                    <label for="apkFile">Upload APK File:</label>
-                    <input type="file" id="apkFile" accept=".apk" required>
-                    <div class="error-message" id="apkFileError"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="developerName">Developer Name (Visible):</label>
-                    <input type="text" id="developerName" required>
-                    <div class="error-message" id="developerNameError"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="developerEmail">Developer Email (Private):</label>
-                    <input type="email" id="developerEmail" required>
-                    <div class="error-message" id="developerEmailError"></div>
-                </div>
-
-                <button type="submit" class="submit-btn">Submit App for Review</button>
-            </form>
-        </div>
+    <div id="developer-form" class="modal">
+        <form>
+            <label>App Logo (square format):</label>
+            <input type="file" id="app-logo" accept="image/*" required>
+            <label>App Name:</label>
+            <input type="text" id="app-name" required>
+            <label>Short Description (max 100 characters):</label>
+            <textarea id="short-description" maxlength="100" required></textarea>
+            <label>Description (max 400 characters):</label>
+            <textarea id="description" maxlength="400" required></textarea>
+            <label>App Images (at least 2, 16:9 or 9:16 ratio):</label>
+            <input type="file" id="app-images" accept="image/*" multiple required>
+            <label>Category:</label>
+            <select id="category" required>
+                <option value="">Select a category</option>
+                <option value="games">Games</option>
+                <option value="productivity">Productivity</option>
+                <option value="social">Social</option>
+            </select>
+            <label>APK File:</label>
+            <input type="file" id="apk-file" accept=".apk" required>
+            <label>Developer Name:</label>
+            <input type="text" id="developer-name" required>
+            <label>Developer Email:</label>
+            <input type="email" id="developer-email" required>
+            <button type="submit">Submit</button>
+        </form>
     </div>
-    <!-- End Developer Submission Modal -->
-
-    <!-- Custom Message Box -->
-    <div id="generalMessageBoxContainer" class="message-box-container">
-        <div class="message-box">
-            <h3 id="generalMessageBoxTitle"></h3>
-            <p id="generalMessageBoxMessage"></p>
-            <button class="ok-button general-ok-button">OK</button>
-        </div>
-    </div>
-
-    <script type="module" src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
