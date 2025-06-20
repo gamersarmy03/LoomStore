@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoomStore - Home</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Tailwind CSS configuration for custom colors and font
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1a1a1a', // Deep black
+                        secondary: '#8a2be2', // BlueViolet for purple accent
+                        accent: '#a78bfa', // Purple-400 for lighter accents
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom styles for the Inter font and general body styling */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a1a; /* Primary black background */
+            color: #ffffff; /* White text for contrast */
+        }
+        /* Style for scrollbar to match theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8a2be2;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a78bfa;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Header Section -->
+    <header class="bg-primary shadow-lg p-4 md:p-6 flex justify-between items-center rounded-b-lg">
+        <h1 class="text-3xl md:text-4xl font-bold text-secondary">LoomStore</h1>
+        <a href="developer.html" class="px-4 py-2 bg-secondary text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition duration-300 transform hover:scale-105">
+            Developer
+        </a>
+    </header>
+
+    <!-- Main Content Section -->
+    <main class="flex-grow container mx-auto p-4 md:p-8">
+        <h2 class="text-2xl md:text-3xl font-bold text-accent mb-6 md:mb-8 text-center">Featured Apps</h2>
+        <div id="app-listings" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+            <!-- App cards will be dynamically loaded here -->
+            <div class="app-card bg-gray-800 p-4 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                <img src="https://placehold.co/160x160/8a2be2/ffffff?text=App+Logo" alt="App Logo" class="w-24 h-24 mx-auto rounded-full mb-4 object-cover border-4 border-accent">
+                <h3 class="text-xl font-bold text-white text-center mb-2">Sample App Name</h3>
+                <p class="text-gray-400 text-sm text-center mb-4">A short description of the sample app.</p>
+                <div class="text-center">
+                    <button class="px-5 py-2 bg-secondary text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition duration-300">
+                        Download
+                    </button>
+                </div>
+            </div>
+            <!-- More sample cards or actual fetched cards -->
+        </div>
+        <div id="no-apps-message" class="text-center text-gray-500 mt-16 text-lg hidden">
+            No apps available yet. Check back soon!
+        </div>
+        <div id="loading-message" class="text-center text-accent mt-16 text-lg hidden">
+            Loading apps...
+        </div>
+        <div id="error-message" class="text-center text-red-500 mt-16 text-lg hidden">
+            Failed to load apps. Please try again later.
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="bg-primary text-gray-400 text-center p-4 md:p-6 mt-8 rounded-t-lg shadow-lg">
+        <p>&copy; 2025 LoomStore. All rights reserved.</p>
+    </footer>
+
+    <!-- Firebase and Appwrite SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { Client, Databases, Storage, Query } from 'https://unpkg.com/appwrite@13.0.0/dist/esm/sdk.js';
+
+        // Firebase Configuration (provided by the Canvas environment)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'; // Fallback for local testing
+
+        let app, auth, db, userId; // Firebase instances (db is Firestore, not used for LoomStore app data here)
+
+        // Initialize Firebase and handle authentication
+        async function initFirebase() {
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+
+                // Sign in with custom token if available, otherwise anonymously
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                    console.log("Firebase signed in with custom token.");
+                } else {
+                    await signInAnonymously(auth);
+                    console.log("Firebase signed in anonymously.");
+                }
+
+                // Listen for auth state changes to get the current user ID
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log("User ID:", userId);
+                    } else {
+                        userId = crypto.randomUUID(); // Fallback if no authenticated user
+                        console.log("No authenticated user, using random UUID:", userId);
+                    }
+                    // Fetch apps once auth is ready and we have a userId
+                    fetchAndDisplayApps();
+                });
+
+            } catch (error) {
+                console.error("Firebase initialization or authentication failed:", error);
+                document.getElementById('error-message').classList.remove('hidden');
+                document.getElementById('loading-message').classList.add('hidden');
+            }
+        }
+
+        // Appwrite Configuration
+        const APPWRITE_ENDPOINT = 'https://cloud.appwrite.io/v1'; // Default Appwrite Cloud endpoint
+        const APPWRITE_PROJECT_ID = '68528057001314063369';
+        const APPWRITE_DATABASE_ID = '6852a77b0029f40ae7a4';
+        const APPWRITE_COLLECTION_ID = '6852a7a3001e4713b6f6';
+
+        const client = new Client();
+        client
+            .setEndpoint(APPWRITE_ENDPOINT)
+            .setProject(APPWRITE_PROJECT_ID);
+
+        const databases = new Databases(client);
+
+        /**
+         * Fetches and displays approved applications from Appwrite.
+         */
+        async function fetchAndDisplayApps() {
+            const appListingsDiv = document.getElementById('app-listings');
+            const loadingMessage = document.getElementById('loading-message');
+            const noAppsMessage = document.getElementById('no-apps-message');
+            const errorMessage = document.getElementById('error-message');
+
+            appListingsDiv.innerHTML = ''; // Clear existing cards
+            loadingMessage.classList.remove('hidden');
+            noAppsMessage.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+
+            try {
+                // Query for documents where status is 'accepted'
+                const response = await databases.listDocuments(
+                    APPWRITE_DATABASE_ID,
+                    APPWRITE_COLLECTION_ID,
+                    [
+                        Query.equal('status', 'accepted'), // Filter for accepted apps
+                        Query.orderDesc('submissionDate') // Order by submission date, newest first
+                    ]
+                );
+
+                if (response.documents.length === 0) {
+                    noAppsMessage.classList.remove('hidden');
+                } else {
+                    response.documents.forEach(app => {
+                        const appCard = `
+                            <div class="app-card bg-gray-800 p-4 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                                <img src="${app.appLogoUrl || 'https://placehold.co/160x160/8a2be2/ffffff?text=App+Logo'}" alt="${app.appName} Logo" class="w-24 h-24 mx-auto rounded-full mb-4 object-cover border-4 border-accent">
+                                <h3 class="text-xl font-bold text-white text-center mb-2">${app.appName}</h3>
+                                <p class="text-gray-400 text-sm text-center mb-4 truncate">${app.shortDescription}</p>
+                                <div class="text-center">
+                                    ${app.apkUrl ? `
+                                        <a href="${app.apkUrl}" download="${app.appName.replace(/\s/g, '_')}.apk" class="px-5 py-2 bg-secondary text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition duration-300">
+                                            Download APK
+                                        </a>` : app.websiteUrl ? `
+                                        <a href="${app.websiteUrl}" target="_blank" class="px-5 py-2 bg-secondary text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition duration-300">
+                                            Visit Website
+                                        </a>` : `
+                                        <span class="px-5 py-2 bg-gray-600 text-gray-300 rounded-lg">No Download Available</span>
+                                    `}
+                                </div>
+                            </div>
+                        `;
+                        appListingsDiv.innerHTML += appCard;
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching apps from Appwrite:", error);
+                errorMessage.classList.remove('hidden');
+            } finally {
+                loadingMessage.classList.add('hidden');
+            }
+        }
+
+        // Initialize Firebase on window load. This will also trigger app fetching.
+        window.onload = initFirebase;
+    </script>
+</body>
+</html>
