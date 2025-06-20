@@ -43,18 +43,24 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(160, 32, 240, 0.5);
         }
+        .upload-area {
+            transition: background-color 0.3s ease;
+        }
+        .upload-area:hover {
+            background-color: rgba(160, 32, 240, 0.1);
+        }
     </style>
 </head>
 <body class="p-6">
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-[#a020f0]">Submit Your App</h2>
-        <button onclick="closeModal()" class="text-gray-400 hover:text-white">&times;</button>
+        <button onclick="closeModal()" class="text-gray-400 hover:text-white text-2xl">×</button>
     </div>
     <form id="submissionForm" class="space-y-6">
         <div class="form-group">
+            <label for="appLogo" class="block text-sm font-medium">App Logo (1:1)</label>
             <input type="file" id="appLogo" accept="image/*" class="hidden">
-            <label for="appLogo" class="block text-sm font-medium cursor-pointer">App Logo (1:1)</label>
-            <div class="mt-2 p-4 bg-gray-900 rounded-lg border border-gray-700 text-center">
+            <div class="mt-2 p-4 bg-gray-900 rounded-lg border border-gray-700 text-center upload-area cursor-pointer">
                 <span id="appLogoText">Upload Logo</span>
             </div>
             <p id="appLogoError" class="error hidden mt-1"></p>
@@ -62,19 +68,22 @@
         <div class="form-group">
             <label for="appName" class="block text-sm font-medium">App Name</label>
             <input type="text" id="appName" class="w-full p-3 bg-gray-900 rounded-lg border border-gray-700" maxlength="50">
+            <p id="appNameError" class="error hidden mt-1"></p>
         </div>
         <div class="form-group">
             <label for="shortDescription" class="block text-sm font-medium">Short Description (max 50 chars)</label>
             <input type="text" id="shortDescription" class="w-full p-3 bg-gray-900 rounded-lg border border-gray-700" maxlength="50">
+            <p id="shortDescriptionError" class="error hidden mt-1"></p>
         </div>
         <div class="form-group">
             <label for="longDescription" class="block text-sm font-medium">Long Description (max 300 chars)</label>
             <textarea id="longDescription" class="w-full p-3 bg-gray-900 rounded-lg border border-gray-700" maxlength="300"></textarea>
+            <p id="longDescriptionError" class="error hidden mt-1"></p>
         </div>
         <div class="form-group">
+            <label for="appScreenshots" class="block text-sm font-medium">App Screenshots (16:9 or 9:16, 2+)</label>
             <input type="file" id="appScreenshots" accept="image/*" multiple class="hidden">
-            <label for="appScreenshots" class="block text-sm font-medium cursor-pointer">App Screenshots (16:9 or 9:16, 2+)</label>
-            <div class="mt-2 p-4 bg-gray-900 rounded-lg border border-gray-700 text-center">
+            <div class="mt-2 p-4 bg-gray-900 rounded-lg border border-gray-700 text-center upload-area cursor-pointer">
                 <span id="appScreenshotsText">Upload Screenshots</span>
             </div>
             <p id="appScreenshotsError" class="error hidden mt-1"></p>
@@ -90,15 +99,21 @@
         </div>
         <div class="form-group">
             <label class="block text-sm font-medium">Distribution Method</label>
-            <div class="flex space-x-4">
-                <label><input type="radio" name="distribution" value="apk" checked> APK Upload</label>
-                <label><input type="radio" name="distribution" value="website"> Website URL</label>
+            <div class="flex space-x-4 mt-2">
+                <label class="flex items-center">
+                    <input type="radio" name="distribution" value="apk" checked class="text-[#a020f0] focus:ring-[#a020f0]">
+                    <span class="ml-2">APK Upload</span>
+                </label>
+                <label class="flex items-center">
+                    <input type="radio" name="distribution" value="website" class="text-[#a020f0] focus:ring-[#a020f0]">
+                    <span class="ml-2">Website URL</span>
+                </label>
             </div>
         </div>
         <div id="apkUpload" class="form-group">
+            <label for="apkFile" class="block text-sm font-medium">Upload APK</label>
             <input type="file" id="apkFile" accept=".apk" class="hidden">
-            <label for="apkFile" class="block text-sm font-medium cursor-pointer">Upload APK</label>
-            <div class="mt-2 p-4 bg-gray-900 rounded-lg border border-gray-700 text-center">
+            <div class="mt-2 p-4 bg-gray-900 rounded-lg border border-gray-700 text-center upload-area cursor-pointer">
                 <span id="apkFileText">Upload APK</span>
             </div>
             <p id="apkFileError" class="error hidden mt-1"></p>
@@ -106,14 +121,17 @@
         <div id="websiteUrl" class="form-group hidden">
             <label for="websiteUrlInput" class="block text-sm font-medium">Website URL</label>
             <input type="url" id="websiteUrlInput" class="w-full p-3 bg-gray-900 rounded-lg border border-gray-700">
+            <p id="websiteUrlError" class="error hidden mt-1"></p>
         </div>
         <div class="form-group">
             <label for="developerName" class="block text-sm font-medium">Developer Name</label>
             <input type="text" id="developerName" class="w-full p-3 bg-gray-900 rounded-lg border border-gray-700">
+            <p id="developerNameError" class="error hidden mt-1"></p>
         </div>
         <div class="form-group">
             <label for="developerEmail" class="block text-sm font-medium">Developer Email</label>
             <input type="email" id="developerEmail" class="w-full p-3 bg-gray-900 rounded-lg border border-gray-700">
+            <p id="developerEmailError" class="error hidden mt-1"></p>
         </div>
         <button type="submit" class="btn-purple w-full text-white px-6 py-3 rounded-lg font-semibold">Submit</button>
     </form>
@@ -130,48 +148,85 @@
         });
         const s3 = new AWS.S3();
 
+        // Handle file input clicks
+        document.querySelectorAll('.upload-area').forEach(area => {
+            const inputId = area.previousElementSibling.id;
+            const input = document.getElementById(inputId);
+            area.addEventListener('click', () => input.click());
+            area.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                area.classList.add('bg-gray-800');
+            });
+            area.addEventListener('dragleave', () => {
+                area.classList.remove('bg-gray-800');
+            });
+            area.addEventListener('drop', (e) => {
+                e.preventDefault();
+                area.classList.remove('bg-gray-800');
+                input.files = e.dataTransfer.files;
+                input.dispatchEvent(new Event('change'));
+            });
+        });
+
+        // Update file input text
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const textElement = document.getElementById(`${e.target.id}Text`);
+                const fileCount = e.target.files.length;
+                textElement.textContent = fileCount ? `${fileCount} file${fileCount > 1 ? 's' : ''} selected` : `Upload ${e.target.id.replace(/([A-Z])/g, ' $1').trim()}`;
+            });
+        });
+
+        // Toggle distribution method
+        document.querySelectorAll('input[name="distribution"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const apkUpload = document.getElementById('apkUpload');
+                const websiteUrl = document.getElementById('websiteUrl');
+                apkUpload.classList.toggle('hidden', e.target.value !== 'apk');
+                websiteUrl.classList.toggle('hidden', e.target.value !== 'website');
+                // Reset inputs when switching
+                document.getElementById('apkFile').value = '';
+                document.getElementById('websiteUrlInput').value = '';
+                document.getElementById('apkFileText').textContent = 'Upload APK';
+                document.getElementById('websiteUrlError').classList.add('hidden');
+                document.getElementById('apkFileError').classList.add('hidden');
+            });
+        });
+
         function validateImage(file, isLogo = false) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
                 img.src = URL.createObjectURL(file);
                 img.onload = () => {
                     const aspectRatio = img.width / img.height;
-                    if (isLogo && aspectRatio !== 1) {
+                    if (isLogo && Math.abs(aspectRatio - 1) > 0.05) {
                         reject('Logo must be square (1:1).');
-                    } else if (!isLogo && ![16/9, 9/16].includes(aspectRatio)) {
+                    } else if (!isLogo && ![16/9, 9/16].some(r => Math.abs(aspectRatio - r) < 0.05)) {
                         reject('Screenshots must be 16:9 or 9:16.');
                     } else {
                         resolve();
                     }
+                    URL.revokeObjectURL(img.src);
                 };
+                img.onerror = () => reject('Invalid image file.');
             });
         }
 
         async function uploadFile(file, path) {
-            const params = {
-                Bucket: 'loomstore',
-                Key: path,
-                Body: file,
-                ContentType: file.type,
-                ACL: 'public-read'
-            };
-            const data = await s3.upload(params).promise();
-            return data.Location;
+            try {
+                const params = {
+                    Bucket: 'loomstore',
+                    Key: path,
+                    Body: file,
+                    ContentType: file.type,
+                    ACL: 'public-read'
+                };
+                const data = await s3.upload(params).promise();
+                return data.Location;
+            } catch (error) {
+                throw new Error(`Failed to upload ${path.split('/')[0]}: ${error.message}`);
+            }
         }
-
-        document.querySelectorAll('input[type="file"]').forEach(input => {
-            input.addEventListener('change', (e) => {
-                const textElement = document.getElementById(`${e.target.id}Text`);
-                textElement.textContent = e.target.files.length ? `${e.target.files.length} file(s) selected` : `Upload ${e.target.id.replace(/([A-Z])/g, ' $1')}`;
-            });
-        });
-
-        document.querySelectorAll('input[name="distribution"]').forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                document.getElementById('apkUpload').classList.toggle('hidden', e.target.value !== 'apk');
-                document.getElementById('websiteUrl').classList.toggle('hidden', e.target.value !== 'website');
-            });
-        });
 
         document.getElementById('submissionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -195,24 +250,32 @@
             };
 
             try {
-                if (!formData.appLogo) throw new Error('App logo is required.');
+                // Validate inputs
+                if (!formData.appLogo) throw new Error('App logo is required.', 'appLogoError');
                 await validateImage(formData.appLogo, true);
-                if (!formData.appName) throw new Error('App name is required.');
-                if (!formData.shortDescription) throw new Error('Short description is required.');
-                if (!formData.longDescription) throw new Error('Long description is required.');
-                if (formData.appScreenshots.length < 2) throw new Error('At least 2 screenshots are required.');
+                if (!formData.appName) throw new Error('App name is required.', 'appNameError');
+                if (!formData.shortDescription) throw new Error('Short description is required.', 'shortDescriptionError');
+                if (!formData.longDescription) throw new Error('Long description is required.', 'longDescriptionError');
+                if (formData.appScreenshots.length < 2) throw new Error('At least 2 screenshots are required.', 'appScreenshotsError');
                 for (const screenshot of formData.appScreenshots) {
                     await validateImage(screenshot);
                 }
-                if (formData.distributionMethod === 'apk' && !formData.apkFile) throw new Error('APK file is required.');
-                if (formData.distributionMethod === 'website' && !formData.websiteUrl) throw new Error('Website URL is required.');
-                if (!formData.developerName) throw new Error('Developer name is required.');
-                if (!formData.developerEmail) throw new Error('Developer email is required.');
+                if (formData.distributionMethod === 'apk' && !formData.apkFile) {
+                    throw new Error('APK file is required.', 'apkFileError');
+                }
+                if (formData.distributionMethod === 'website' && !formData.websiteUrl) {
+                    throw new Error('Website URL is required.', 'websiteUrlError');
+                }
+                if (!formData.developerName) throw new Error('Developer name is required.', 'developerNameError');
+                if (!formData.developerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.developerEmail)) {
+                    throw new Error('Valid developer email is required.', 'developerEmailError');
+                }
 
+                // Upload files to S3
                 const appLogoUrl = await uploadFile(formData.appLogo, `logos/${Date.now()}_${formData.appLogo.name}`);
                 const appImageUrls = [];
-                for (const screenshot of formData.appScreenshots) {
-                    const url = await uploadFile(screenshot, `screenshots/${Date.now()}_${screenshot.name}`);
+                for (const [index, screenshot] of formData.appScreenshots.entries()) {
+                    const url = await uploadFile(screenshot, `screenshots/${Date.now()}_${index}_${screenshot.name}`);
                     appImageUrls.push(url);
                 }
                 let apkUrl = '';
@@ -220,10 +283,11 @@
                     apkUrl = await uploadFile(formData.apkFile, `apks/${Date.now()}_${formData.apkFile.name}`);
                 }
 
+                // Save metadata to Appwrite
                 const metadata = {
                     appName: formData.appName,
                     shortDescription: formData.shortDescription,
-                    longDescription: formData.description,
+                    longDescription: formData.longDescription,
                     appCategory: formData.appCategory,
                     distributionMethod: formData.distributionMethod,
                     websiteUrl: formData.websiteUrl || '',
@@ -239,20 +303,26 @@
                 await database.createDocument(
                     '6852a77b0029f40ae7a4',
                     '6852a7a3001e4713b6f6',
-                    'unique',
+                    'unique()',
                     metadata
                 );
 
                 alert('Application submitted successfully!');
                 document.getElementById('submissionForm').reset();
+                document.querySelectorAll('.upload-area span').forEach(span => {
+                    span.textContent = `Upload ${span.id.replace('Text', '').replace(/([A-Z])/g, ' $1').trim()}`;
+                });
                 closeModal();
             } catch (error) {
-                const errorElement = document.getElementById(`${error.message.includes(' ').toLowerCase().replace(/\s/g, '')}Error` || 'error`);
-                if (errorElement) {
-                    errorElement.textContent = error.message;
-                    errorElement.classList.remove('hidden');
+                const errorId = error.message.split(',')[1]?.trim() || 'generalError';
+                const errorElement = document.getElementById(errorId) || document.createElement('p');
+                if (errorId === 'generalError') {
+                    errorElement.className = 'error mt-2';
+                    errorElement.textContent = error.message.split(',')[0];
+                    document.getElementById('submissionForm').appendChild(errorElement);
                 } else {
-                    alert(error.message);
+                    errorElement.textContent = error.message.split(',')[0];
+                    errorElement.classList.remove('hidden');
                 }
             }
         });
