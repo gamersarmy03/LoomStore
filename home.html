@@ -3,326 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LoomStore</title>
-    <!-- Tailwind CSS CDN -->
+    <title>LoomStore - App Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@appwrite.io/sdk@15.0.0/dist/index.min.js"></script>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #000000; /* Dark black primary theme */
-            color: #ffffff;
-        }
-        body.modal-open {
-            overflow: hidden; /* Hide scrollbar when modal is open */
-        }
-        /* Custom scrollbar for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #2a2a2a;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #a020f0; /* Vibrant purple */
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #8e1ad4;
-        }
-
-        .purple-gradient-button {
-            background: linear-gradient(to right, #a020f0, #c879ff); /* Vibrant purple gradient */
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            box-shadow: 0 4px 15px rgba(160, 32, 240, 0.4);
-        }
-        .purple-gradient-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(160, 32, 240, 0.6);
-        }
-        .purple-border {
-            border-color: #a020f0;
-        }
-        .purple-text {
-            color: #a020f0;
-        }
-
-        /* Modal-related styles removed as modal is moved to developer.html */
-
-        .card-animation {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Default shadow for cards */
-        }
-        .card-animation:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(160, 32, 240, 0.3);
-        }
-        /* Hide number input arrows */
-        input[type='number']::-webkit-inner-spin-button,
-        input[type='number']::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type='number'] {
-            -moz-appearance: textfield;
-        }
-
-        /* Hero section specific styles */
-        .hero-section {
-            background: linear-gradient(135deg, #000000, #1a052e); /* Darker gradient */
-            padding: 8rem 0; /* More padding for a grander feel */
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at center, rgba(160, 32, 240, 0.15) 0%, transparent 70%);
-            animation: pulse-bg 15s infinite alternate;
-        }
-
-        @keyframes pulse-bg {
-            0% { transform: scale(1); opacity: 0.5; }
-            100% { transform: scale(1.2); opacity: 0.8; }
-        }
-
-        .app-card-download:hover .download-icon {
-            transform: translateX(5px);
-        }
-        .download-icon {
-            transition: transform 0.2s ease-in-out;
-        }
-
-        /* Message box styling */
-        .message-box {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #333;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
             color: white;
-            padding: 15px 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            z-index: 1001; /* Ensure message box is on top */
+            font-family: 'Inter', sans-serif;
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease;
             opacity: 0;
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            animation: fadeIn 0.5s forwards;
         }
-        .message-box.show {
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 32px rgba(160, 32, 240, 0.4);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            transform: scale(0.95);
+        }
+        .modal.show {
             opacity: 1;
-            transform: translateX(-50%) translateY(-10px);
+            transform: scale(1);
         }
-        .message-box.success {
-            background-color: #16a34a; /* Green */
+        .search-bar {
+            transition: all 0.3s ease;
         }
-        .message-box.error {
-            background-color: #dc2626; /* Red */
+        .search-bar:focus {
+            box-shadow: 0 0 0 3px rgba(160, 32, 240, 0.3);
         }
-
-        /* Search input styling */
-        .search-input-group {
-            position: relative;
-            width: 100%;
-            max-width: 500px; /* Limit width for aesthetics */
-            margin: 0 auto; /* Center the search bar */
+        .btn-purple {
+            background: linear-gradient(90deg, #a020f0, #c084fc);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .search-input-group input {
-            padding-left: 3rem; /* Space for icon */
-        }
-        .search-input-group .search-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #a020f0;
+        .btn-purple:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(160, 32, 240, 0.5);
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
-    <!-- Header -->
-    <header class="bg-gray-900 p-4 shadow-lg sticky top-0 z-10">
-        <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
-            <h1 class="text-3xl font-bold purple-text">LoomStore</h1>
-            <div class="search-input-group">
-                <input type="text" id="search-bar" placeholder="Search apps..." class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:ring focus:ring-purple-text focus:border-purple-text text-white">
-                <span class="search-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </span>
-            </div>
-            <!-- Changed button to anchor tag linking to developer.html -->
-            <a href="developer.html" class="purple-gradient-button text-white px-6 py-2 rounded-lg font-semibold shadow-lg inline-flex items-center justify-center">
-                Developer
-            </a>
-        </div>
+    <header class="bg-black bg-opacity-90 backdrop-blur-sm p-4 flex justify-between items-center sticky top-0 z-10">
+        <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#a020f0] to-[#c084fc]">
+            LoomStore
+        </h1>
+        <button onclick="openDeveloperModal()" class="btn-purple text-white px-6 py-2 rounded-full font-semibold">
+            Developer
+        </button>
     </header>
-
-    <!-- Hero Section -->
-    <section class="hero-section text-white relative">
-        <div class="relative z-10 container mx-auto px-4 py-16">
-            <h2 class="text-5xl md:text-6xl font-extrabold mb-4 animate-fade-in-up">Discover Your Next Favorite App</h2>
-            <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto animate-fade-in">
-                Explore a curated collection of innovative applications and games for every need.
-            </p>
-            <button class="purple-gradient-button text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl animate-scale-in">
-                Browse Apps
-            </button>
+    <main class="flex-1 p-6 max-w-7xl mx-auto">
+        <div class="mb-6">
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search apps..."
+                class="search-bar w-full p-3 bg-gray-900 text-white rounded-full border border-gray-700 focus:outline-none focus:border-[#a020f0]"
+            >
         </div>
-    </section>
-
-    <!-- Main Content Area - App Listings -->
-    <main class="flex-grow container mx-auto px-4 py-8">
-        <h2 class="text-4xl font-extrabold mb-8 text-center">Featured Apps</h2>
-        <div id="app-listings" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            <!-- Dynamic App Cards will be inserted here by JavaScript -->
-        </div>
-        <p id="no-apps-message" class="text-center text-gray-400 mt-8 hidden">No approved apps found.</p>
+        <div id="appGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
     </main>
 
-    <!-- Message Box for Alerts -->
-    <div id="message-box" class="message-box"></div>
+    <!-- Developer Modal -->
+    <div id="developerModal" class="fixed inset-0 bg-black bg-opacity-80 hidden modal flex items-center justify-center z-50">
+        <iframe id="developerFrame" src="developer.html" class="w-full max-w-3xl h-[85vh] bg-black rounded-2xl shadow-2xl"></iframe>
+    </div>
 
-    <script type="module">
-        // Import Appwrite SDK
-        import { Client, Databases, Query } from 'https://cdn.jsdelivr.net/npm/appwrite@11.0.0/dist/esm/sdk.mjs';
+    <script>
+        const client = new Appwrite.Client();
+        client.setEndpoint('https://cloud.appwrite.io/v1').setProject('68528057001314063369');
+        const database = new Appwrite.Databases(client);
 
-        // Appwrite Configuration
-        const APPWRITE_ENDPOINT = 'https://cloud.appwrite.io/v1'; // Default Appwrite Cloud Endpoint
-        const APPWRITE_PROJECT_ID = '68528057001314063369';
-        const APPWRITE_DATABASE_ID = '6852a77b0029f40ae7a4';
-        const APPWRITE_COLLECTION_ID = '6852a7a3001e4713b6f6';
-
-        // Initialize Appwrite Client
-        const client = new Client();
-        client
-            .setEndpoint(APPWRITE_ENDPOINT)
-            .setProject(APPWRITE_PROJECT_ID);
-
-        const databases = new Databases(client);
-
-        // DOM Elements (Only those relevant to main.html)
-        const messageBox = document.getElementById('message-box');
-        const searchBar = document.getElementById('search-bar');
-        const appListingsContainer = document.getElementById('app-listings');
-        const noAppsMessage = document.getElementById('no-apps-message');
-
-        // Function to show a custom message box
-        function showMessageBox(message, type = 'info') {
-            messageBox.textContent = message;
-            messageBox.className = `message-box show ${type}`;
-            setTimeout(() => {
-                messageBox.classList.remove('show');
-                setTimeout(() => messageBox.textContent = '', 300);
-            }, 3000);
-        }
-
-        // --- App Listing and Search Functionality (for approved apps) ---
-
-        // Function to fetch and display approved applications
-        async function fetchAndDisplayApprovedApps() {
+        async function loadApps(searchTerm = '') {
             try {
-                const response = await databases.listDocuments(
-                    APPWRITE_DATABASE_ID,
-                    APPWRITE_COLLECTION_ID,
-                    [
-                        Query.equal('status', 'approved'),
-                        Query.orderDesc('submissionDate') // Order by submission date, newest first
-                    ]
-                );
-                const approvedApps = response.documents;
-                renderApprovedApps(approvedApps);
-            } catch (error) {
-                console.error('Error fetching approved apps:', error);
-                showMessageBox('Error loading apps. Please try again later.', 'error');
-            }
-        }
-
-        // Function to render approved app cards
-        function renderApprovedApps(apps) {
-            appListingsContainer.innerHTML = ''; // Clear existing cards
-
-            if (apps.length === 0) {
-                noAppsMessage.textContent = 'No approved apps found.';
-                noAppsMessage.classList.remove('hidden');
-                return;
-            } else {
-                noAppsMessage.classList.add('hidden');
-            }
-
-            apps.forEach(app => {
-                const card = document.createElement('div');
-                card.classList.add('app-card', 'bg-gray-800', 'rounded-xl', 'shadow-xl', 'p-6', 'flex', 'flex-col', 'items-center', 'text-center', 'card-animation');
-                card.dataset.appName = app.appName.toLowerCase(); // For search
-                card.dataset.appCategory = app.appCategory.toLowerCase(); // For search
-
-                let downloadLink = '#';
-                let downloadText = 'Details';
-                if (app.distributionMethod === 'apk' && app.apkUrl) {
-                    downloadLink = app.apkUrl;
-                    downloadText = 'Download APK';
-                } else if (app.distributionMethod === 'website' && app.websiteUrl) {
-                    downloadLink = app.websiteUrl;
-                    downloadText = 'Visit Website';
-                }
-
-                card.innerHTML = `
-                    <img src="${app.appLogoUrl || 'https://placehold.co/128x128/a020f0/ffffff?text=App'}" alt="App Logo" class="w-32 h-32 rounded-full mb-4 border-4 border-purple-text object-cover">
-                    <h3 class="text-xl font-bold mb-2">${app.appName}</h3>
-                    <p class="text-gray-400 text-sm mb-4 truncate w-full px-2">${app.shortDescription}</p>
-                    <button class="purple-gradient-button text-white px-4 py-2 rounded-lg font-semibold app-card-download" onclick="window.open('${downloadLink}', '_blank')">
-                        ${downloadText}
-                        <span class="download-icon inline-block ml-2">&#x2193;</span>
-                    </button>
-                `;
-                appListingsContainer.appendChild(card);
-            });
-        }
-
-        // Search Bar Functionality
-        if (searchBar) {
-            searchBar.addEventListener('input', () => {
-                const searchTerm = searchBar.value.toLowerCase();
-                const cards = document.querySelectorAll('.app-card');
-                let visibleCount = 0;
-
-                cards.forEach(card => {
-                    const appName = card.dataset.appName;
-                    const appCategory = card.dataset.appCategory;
-
-                    if (appName && appCategory && (appName.includes(searchTerm) || appCategory.includes(searchTerm))) {
-                        card.style.display = 'flex';
-                        visibleCount++;
-                    } else {
-                        card.style.display = 'none';
-                    }
+                const queries = [Appwrite.Query.equal('status', 'approved')];
+                if (searchTerm) queries.push(Appwrite.Query.search('appName', searchTerm));
+                const response = await database.listDocuments('6852a77b0029f40ae7a4', '6852a7a3001e4713b6f6', queries);
+                const appGrid = document.getElementById('appGrid');
+                appGrid.innerHTML = '';
+                response.documents.forEach((app, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'card bg-gray-900 p-4 rounded-xl';
+                    card.style.animationDelay = `${index * 0.1}s`;
+                    card.innerHTML = `
+                        <img src="${app.appLogoUrl}" alt="${app.appName}" class="w-full h-40 object-cover rounded-lg mb-3">
+                        <h3 class="text-lg font-semibold text-white">${app.appName}</h3>
+                        <p class="text-sm text-gray-400 line-clamp-2">${app.shortDescription}</p>
+                        <button class="btn-purple w-full mt-3 text-white px-4 py-2 rounded-lg font-medium">Download</button>
+                    `;
+                    appGrid.appendChild(card);
                 });
-
-                if (noAppsMessage) {
-                    if (visibleCount === 0 && searchTerm !== '') {
-                        noAppsMessage.textContent = 'No matching apps found.';
-                        noAppsMessage.classList.remove('hidden');
-                    } else if (visibleCount === 0) {
-                        noAppsMessage.textContent = 'No approved apps found.';
-                        noAppsMessage.classList.remove('hidden');
-                    } else {
-                        noAppsMessage.classList.add('hidden');
-                    }
-                }
-            });
+            } catch (error) {
+                console.error('Error loading apps:', error);
+            }
         }
 
-        // Initial fetch of approved applications when the page loads
-        document.addEventListener('DOMContentLoaded', fetchAndDisplayApprovedApps);
+        function openDeveloperModal() {
+            const modal = document.getElementById('developerModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.add('show'), 10);
+        }
+
+        function closeDeveloperModal() {
+            const modal = document.getElementById('developerModal');
+            modal.classList.remove('show');
+            setTimeout(() => modal.classList.add('hidden'), 400);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            loadApps(e.target.value.toLowerCase());
+        });
+
+        window.addEventListener('message', (event) => {
+            if (event.data === 'closeModal') closeDeveloperModal();
+        });
+
+        loadApps();
     </script>
 </body>
 </html>
