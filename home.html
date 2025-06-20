@@ -198,63 +198,10 @@
     <main class="flex-grow container mx-auto px-4 py-8">
         <h2 class="text-4xl font-extrabold mb-8 text-center">Featured Apps</h2>
         <div id="app-listings" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            <!-- Dynamic App Cards will be inserted here -->
-            <!-- Placeholder App Cards for initial view -->
-            <div class="app-card bg-gray-800 rounded-xl shadow-xl p-6 flex flex-col items-center text-center card-animation" data-app-name="Cool App Name" data-app-category="Productivity">
-                <img src="https://placehold.co/128x128/a020f0/ffffff?text=App" alt="App Logo" class="w-32 h-32 rounded-full mb-4 border-4 border-purple-text">
-                <h3 class="text-xl font-bold mb-2">Cool App Name</h3>
-                <p class="text-gray-400 text-sm mb-4">A short description about this awesome app.</p>
-                <button class="purple-gradient-button text-white px-4 py-2 rounded-lg font-semibold app-card-download">
-                    Download
-                    <span class="download-icon inline-block ml-2">&#x2193;</span> <!-- Unicode Down Arrow -->
-                </button>
-            </div>
-            <div class="app-card bg-gray-800 rounded-xl shadow-xl p-6 flex flex-col items-center text-center card-animation" data-app-name="Exciting Game Title" data-app-category="Games">
-                <img src="https://placehold.co/128x128/a020f0/ffffff?text=Game" alt="App Logo" class="w-32 h-32 rounded-full mb-4 border-4 border-purple-text">
-                <h3 class="text-xl font-bold mb-2">Exciting Game Title</h3>
-                <p class="text-gray-400 text-sm mb-4">Jump, run, and explore in this thrilling adventure!</p>
-                <button class="purple-gradient-button text-white px-4 py-2 rounded-lg font-semibold app-card-download">
-                    Download
-                    <span class="download-icon inline-block ml-2">&#x2193;</span>
-                </button>
-            </div>
-            <div class="app-card bg-gray-800 rounded-xl shadow-xl p-6 flex flex-col items-center text-center card-animation" data-app-name="Productivity Tool" data-app-category="Productivity">
-                <img src="https://placehold.co/128x128/a020f0/ffffff?text=Utility" alt="App Logo" class="w-32 h-32 rounded-full mb-4 border-4 border-purple-text">
-                <h3 class="text-xl font-bold mb-2">Productivity Tool</h3>
-                <p class="text-gray-400 text-sm mb-4">Boost your efficiency with this handy utility app.</p>
-                <button class="purple-gradient-button text-white px-4 py-2 rounded-lg font-semibold app-card-download">
-                    Download
-                    <span class="download-icon inline-block ml-2">&#x2193;</span>
-                </button>
-            </div>
-            <div class="app-card bg-gray-800 rounded-xl shadow-xl p-6 flex flex-col items-center text-center card-animation" data-app-name="Social Connect" data-app-category="Social">
-                <img src="https://placehold.co/128x128/a020f0/ffffff?text=Social" alt="App Logo" class="w-32 h-32 rounded-full mb-4 border-4 border-purple-text">
-                <h3 class="text-xl font-bold mb-2">Social Connect</h3>
-                <p class="text-gray-400 text-sm mb-4">Connect with friends and family effortlessly.</p>
-                <button class="purple-gradient-button text-white px-4 py-2 rounded-lg font-semibold app-card-download">
-                    Download
-                    <span class="download-icon inline-block ml-2">&#x2193;</span>
-                </button>
-            </div>
-            <div class="app-card bg-gray-800 rounded-xl shadow-xl p-6 flex flex-col items-center text-center card-animation" data-app-name="Learning Hub" data-app-category="Education">
-                <img src="https://placehold.co/128x128/a020f0/ffffff?text=Edu" alt="App Logo" class="w-32 h-32 rounded-full mb-4 border-4 border-purple-text">
-                <h3 class="text-xl font-bold mb-2">Learning Hub</h3>
-                <p class="text-gray-400 text-sm mb-4">Expand your knowledge with interactive courses.</p>
-                <button class="purple-gradient-button text-white px-4 py-2 rounded-lg font-semibold app-card-download">
-                    Download
-                    <span class="download-icon inline-block ml-2">&#x2193;</span>
-                </button>
-            </div>
-            <div class="app-card bg-gray-800 rounded-xl shadow-xl p-6 flex flex-col items-center text-center card-animation" data-app-name="Fitness Tracker" data-app-category="Health & Fitness">
-                <img src="https://placehold.co/128x128/a020f0/ffffff?text=Fit" alt="App Logo" class="w-32 h-32 rounded-full mb-4 border-4 border-purple-text">
-                <h3 class="text-xl font-bold mb-2">Fitness Tracker</h3>
-                <p class="text-gray-400 text-sm mb-4">Monitor your health and achieve your goals.</p>
-                <button class="purple-gradient-button text-white px-4 py-2 rounded-lg font-semibold app-card-download">
-                    Download
-                    <span class="download-icon inline-block ml-2">&#x2193;</span>
-                </button>
-            </div>
+            <!-- Dynamic App Cards will be inserted here by JavaScript -->
+            <!-- Placeholder App Cards removed as they will be fetched dynamically from Appwrite or added by JS -->
         </div>
+        <p id="no-apps-message" class="text-center text-gray-400 mt-8 hidden">No approved apps found.</p>
     </main>
 
     <!-- Developer Submission Modal -->
@@ -297,13 +244,13 @@
                     <label for="app-category" class="block text-gray-300 text-sm font-semibold mb-2">App Category</label>
                     <select id="app-category" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:ring focus:ring-purple-text focus:border-purple-text" required>
                         <option value="" disabled selected>Select a category</option>
-                        <option value="games">Games</option>
-                        <option value="productivity">Productivity</option>
-                        <option value="social">Social</option>
-                        <option value="education">Education</option>
-                        <option value="entertainment">Entertainment</option>
-                        <option value="utilities">Utilities</option>
-                        <option value="health-fitness">Health & Fitness</option>
+                        <option value="Games">Games</option>
+                        <option value="Productivity">Productivity</option>
+                        <option value="Social">Social</option>
+                        <option value="Education">Education</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Health & Fitness">Health & Fitness</option>
                     </select>
                 </div>
 
@@ -351,7 +298,27 @@
     <!-- Message Box for Alerts -->
     <div id="message-box" class="message-box"></div>
 
-    <script>
+    <script type="module">
+        // Import Appwrite SDK
+        import { Client, Databases, ID, Query } from 'https://cdn.jsdelivr.net/npm/appwrite@11.0.0/dist/esm/sdk.mjs';
+
+        // Appwrite & Archive.org S3 Configuration
+        const APPWRITE_ENDPOINT = 'https://cloud.appwrite.io/v1'; // Default Appwrite Cloud Endpoint
+        const APPWRITE_PROJECT_ID = '68528057001314063369';
+        const APPWRITE_DATABASE_ID = '6852a77b0029f40ae7a4';
+        const APPWRITE_COLLECTION_ID = '6852a7a3001e4713b6f6';
+        // Note: For a real application, Archive.org S3 keys should ideally be used server-side
+        // or through pre-signed URLs to prevent exposure. For this demo, we'll simulate S3 URLs.
+        const ARCHIVE_S3_BASE_URL = 'https://archive.org/details/'; // A dummy base URL for simulated files
+
+        // Initialize Appwrite Client
+        const client = new Client();
+        client
+            .setEndpoint(APPWRITE_ENDPOINT)
+            .setProject(APPWRITE_PROJECT_ID);
+
+        const databases = new Databases(client);
+
         // DOM Elements
         const developerButton = document.getElementById('developer-button');
         const submissionModal = document.getElementById('submission-modal');
@@ -371,55 +338,46 @@
         const screenshotsError = document.getElementById('screenshots-error');
         const messageBox = document.getElementById('message-box');
         const searchBar = document.getElementById('search-bar');
-        const appCards = document.querySelectorAll('.app-card'); // Select all app cards
-
-        // Appwrite & Archive.org S3 Configuration (for future implementation)
-        const APPWRITE_PROJECT_ID = '68528057001314063369';
-        const APPWRITE_DATABASE_ID = '6852a77b0029f40ae7a4';
-        const APPWRITE_COLLECTION_ID = '6852a7a3001e4713b6f6';
-        const ARCHIVE_S3_ACCESS_KEY = 'cFDtuIpumfXlW76M';
-        const ARCHIVE_S3_SECRET_KEY = 'NVbTrPoAOnJYzeMJ';
-        // Note: For a real application, these keys should be stored securely (e.g., environment variables)
-        // and handled server-side to prevent exposure in client-side code.
+        const appListingsContainer = document.getElementById('app-listings');
+        const noAppsMessage = document.getElementById('no-apps-message');
 
         // Function to show a custom message box
         function showMessageBox(message, type = 'info') {
             messageBox.textContent = message;
-            messageBox.className = `message-box show ${type}`; // Add type for styling (success/error)
+            messageBox.className = `message-box show ${type}`;
             setTimeout(() => {
                 messageBox.classList.remove('show');
-                // Optional: Clear message content after fading out
                 setTimeout(() => messageBox.textContent = '', 300);
-            }, 3000); // Hide after 3 seconds
+            }, 3000);
         }
 
         // --- Modal Functionality ---
         developerButton.addEventListener('click', () => {
             submissionModal.classList.remove('hidden');
-            document.body.classList.add('modal-open'); // Add class to body to hide scrollbar
+            document.body.classList.add('modal-open');
             setTimeout(() => {
                 submissionModal.classList.add('opacity-100');
                 submissionModal.querySelector('.modal-content').classList.add('active');
-            }, 10); // Small delay for transition
+            }, 10);
         });
 
         closeModalButton.addEventListener('click', () => {
             submissionModal.classList.remove('opacity-100');
             submissionModal.querySelector('.modal-content').classList.remove('active');
-            document.body.classList.remove('modal-open'); // Remove class from body to restore scrollbar
+            document.body.classList.remove('modal-open');
             setTimeout(() => {
                 submissionModal.classList.add('hidden');
-                submissionForm.reset(); // Reset form on close
+                submissionForm.reset();
                 // Re-initialize dynamic sections
                 apkUploadSection.classList.remove('hidden');
                 websiteUrlSection.classList.add('hidden');
-                appLogoInput.value = ''; // Clear file inputs
+                appLogoInput.value = '';
                 appScreenshotsInput.value = '';
                 document.getElementById('apk-file').value = '';
                 logoError.classList.add('hidden');
                 screenshotsError.classList.add('hidden');
                 updateCharCounts();
-            }, 300); // Match transition duration
+            }, 300);
         });
 
         // Close modal when clicking outside (on overlay)
@@ -436,20 +394,19 @@
                 websiteUrlSection.classList.add('hidden');
                 document.getElementById('apk-file').setAttribute('required', 'true');
                 document.getElementById('website-url').removeAttribute('required');
-                document.getElementById('website-url').value = ''; // Clear URL if switching to APK
+                document.getElementById('website-url').value = '';
             } else {
                 apkUploadSection.classList.add('hidden');
                 websiteUrlSection.classList.remove('hidden');
                 document.getElementById('apk-file').removeAttribute('required');
-                document.getElementById('apk-file').value = ''; // Clear APK if switching to website
+                document.getElementById('apk-file').value = '';
                 document.getElementById('website-url').setAttribute('required', 'true');
             }
         }
 
         distApkRadio.addEventListener('change', toggleDistributionMethod);
         distWebsiteRadio.addEventListener('change', toggleDistributionMethod);
-        // Initialize on load
-        toggleDistributionMethod();
+        toggleDistributionMethod(); // Initialize on load
 
         // --- Character Count for Descriptions ---
         function updateCharCounts() {
@@ -459,8 +416,7 @@
 
         shortDescriptionInput.addEventListener('input', updateCharCounts);
         longDescriptionInput.addEventListener('input', updateCharCounts);
-        // Initialize counts on modal open (or page load if not a modal)
-        updateCharCounts();
+        updateCharCounts(); // Initialize counts on load
 
         // --- File Input Validation (Aspect Ratio for Logo/Screenshots) ---
 
@@ -483,7 +439,7 @@
                 }
 
                 filesArray.forEach(f => {
-                    if (!f.type.startsWith('image/')) { // Ensure it's an image
+                    if (!f.type.startsWith('image/')) {
                         allValid = false;
                         processedCount++;
                         if (processedCount === filesArray.length) {
@@ -506,8 +462,7 @@
                             } else if (aspectRatioRegex === '16:9_or_9:16') {
                                 const ratio16_9 = 16 / 9;
                                 const ratio9_16 = 9 / 16;
-                                // Allow a small tolerance for floating point comparisons
-                                isValidAspectRatio = (Math.abs(aspectRatio - ratio16_9) < 0.05) || (Math.abs(aspectRatio - ratio9_16) < 0.05); // Increased tolerance
+                                isValidAspectRatio = (Math.abs(aspectRatio - ratio16_9) < 0.05) || (Math.abs(aspectRatio - ratio9_16) < 0.05);
                             }
 
                             if (!isValidAspectRatio) {
@@ -518,7 +473,7 @@
                                 resolve(allValid);
                             }
                         };
-                        img.onerror = () => { // Handle image loading errors
+                        img.onerror = () => {
                             allValid = false;
                             processedCount++;
                             if (processedCount === filesArray.length) {
@@ -539,12 +494,12 @@
                 if (!isValid) {
                     logoError.textContent = 'Please upload a square image (e.g., 1:1 aspect ratio).';
                     logoError.classList.remove('hidden');
-                    appLogoInput.value = ''; // Clear the input
+                    appLogoInput.value = '';
                 } else {
                     logoError.classList.add('hidden');
                 }
             } else {
-                logoError.classList.add('hidden'); // Hide error if no file selected
+                logoError.classList.add('hidden');
             }
         });
 
@@ -561,32 +516,38 @@
                 if (!isValid) {
                     screenshotsError.textContent = 'Please upload at least 2 images with 16:9 or 9:16 aspect ratio.';
                     screenshotsError.classList.remove('hidden');
-                    appScreenshotsInput.value = ''; // Clear the input
+                    appScreenshotsInput.value = '';
                 } else {
                     screenshotsError.classList.add('hidden');
                 }
             } else {
-                screenshotsError.classList.add('hidden'); // Hide error if no file selected
+                screenshotsError.classList.add('hidden');
             }
         });
 
+        // Function to simulate file upload and return a dummy URL
+        function simulateFileUpload(file, type = 'general') {
+            const fileName = file ? file.name : `dummy-file-${Date.now()}.png`;
+            // In a real scenario, you'd upload to Archive.org S3 here and get the actual URL.
+            // For now, we generate a unique placeholder URL.
+            return `${ARCHIVE_S3_BASE_URL}loomstore-${type}-${ID.unique()}-${fileName}`;
+        }
+
         // --- Form Submission Logic ---
         submissionForm.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Prevent default form submission
+            e.preventDefault();
 
-            // Simple client-side validation
             let isValid = true;
             const requiredFields = submissionForm.querySelectorAll('[required]');
             requiredFields.forEach(field => {
                 if (!field.value) {
                     isValid = false;
-                    field.classList.add('border-red-500'); // Highlight empty required fields
+                    field.classList.add('border-red-500');
                 } else {
                     field.classList.remove('border-red-500');
                 }
             });
 
-            // Re-check file validations on submit
             const isLogoValid = await checkImageDimensions(appLogoInput.files[0], '1:1');
             if (!isLogoValid) {
                 isValid = false;
@@ -610,94 +571,139 @@
                 return;
             }
 
-            // Collect form data
-            const formData = {
+            // Simulate file uploads and get dummy URLs
+            const appLogoUrl = appLogoInput.files[0] ? simulateFileUpload(appLogoInput.files[0], 'logo') : '';
+            const appImageUrls = appScreenshotsInput.files.length > 0 ? Array.from(appScreenshotsInput.files).map(file => simulateFileUpload(file, 'screenshot')) : [];
+            let apkUrl = null;
+            if (document.querySelector('input[name="distribution-method"]:checked').value === 'apk' && document.getElementById('apk-file').files[0]) {
+                apkUrl = simulateFileUpload(document.getElementById('apk-file').files[0], 'apk');
+            }
+
+            const submissionData = {
                 appName: document.getElementById('app-name').value,
                 shortDescription: shortDescriptionInput.value,
                 longDescription: longDescriptionInput.value,
                 appCategory: document.getElementById('app-category').value,
                 distributionMethod: document.querySelector('input[name="distribution-method"]:checked').value,
+                websiteUrl: document.getElementById('website-url').value || null,
+                apkUrl: apkUrl,
                 developerName: document.getElementById('developer-name').value,
                 developerEmail: document.getElementById('developer-email').value,
-                appLogoFile: appLogoInput.files[0],
-                appScreenshotFiles: Array.from(appScreenshotsInput.files),
                 submissionDate: new Date().toISOString(),
-                status: 'pending'
+                status: 'pending', // Always pending upon submission
+                appLogoUrl: appLogoUrl,
+                appImageUrls: appImageUrls,
             };
 
-            if (formData.distributionMethod === 'website') {
-                formData.websiteUrl = document.getElementById('website-url').value;
-                formData.apkFile = null; // No APK if website distribution
-            } else { // apk distribution
-                formData.apkFile = document.getElementById('apk-file').files[0];
-                formData.websiteUrl = null; // No website URL if APK distribution
+            try {
+                // Save data to Appwrite
+                const response = await databases.createDocument(
+                    APPWRITE_DATABASE_ID,
+                    APPWRITE_COLLECTION_ID,
+                    ID.unique(), // Let Appwrite generate a unique ID
+                    submissionData
+                );
+                console.log('App submitted successfully to Appwrite:', response);
+                showMessageBox('App submitted successfully! We will review it shortly.', 'success');
+                closeModalButton.click(); // Close modal on success
+            } catch (error) {
+                console.error('Error submitting app to Appwrite:', error);
+                showMessageBox('Error submitting app. Please try again.', 'error');
+            }
+        });
+
+        // --- App Listing and Search Functionality (for approved apps) ---
+
+        // Function to fetch and display approved applications
+        async function fetchAndDisplayApprovedApps() {
+            try {
+                const response = await databases.listDocuments(
+                    APPWRITE_DATABASE_ID,
+                    APPWRITE_COLLECTION_ID,
+                    [
+                        Query.equal('status', 'approved'),
+                        Query.orderDesc('submissionDate') // Order by submission date, newest first
+                    ]
+                );
+                const approvedApps = response.documents;
+                renderApprovedApps(approvedApps);
+            } catch (error) {
+                console.error('Error fetching approved apps:', error);
+                showMessageBox('Error loading apps. Please try again later.', 'error');
+            }
+        }
+
+        // Function to render approved app cards
+        function renderApprovedApps(apps) {
+            appListingsContainer.innerHTML = ''; // Clear existing cards
+
+            if (apps.length === 0) {
+                noAppsMessage.classList.remove('hidden');
+                return;
+            } else {
+                noAppsMessage.classList.add('hidden');
             }
 
-            console.log('Collected Form Data:', formData);
+            apps.forEach(app => {
+                const card = document.createElement('div');
+                card.classList.add('app-card', 'bg-gray-800', 'rounded-xl', 'shadow-xl', 'p-6', 'flex', 'flex-col', 'items-center', 'text-center', 'card-animation');
+                card.dataset.appName = app.appName.toLowerCase(); // For search
+                card.dataset.appCategory = app.appCategory.toLowerCase(); // For search
 
-            // --- Placeholder for Actual Submission Logic (S3 and Appwrite) ---
-            // In a real application, you would perform the following steps:
-            // 1. Upload appLogoFile, appScreenshotFiles, and apkFile (if applicable) to Archive.org S3.
-            //    - Use the ARCHIVE_S3_ACCESS_KEY and ARCHIVE_S3_SECRET_KEY.
-            //    - Get the S3 URLs for the uploaded files.
-            // 2. Prepare the metadata object with S3 URLs and other form data.
-            //    - Example structure:
-            //      {
-            //        appName: formData.appName,
-            //        shortDescription: formData.shortDescription,
-            //        longDescription: formData.longDescription,
-            //        appCategory: formData.appCategory,
-            //        distributionMethod: formData.distributionMethod,
-            //        websiteUrl: formData.websiteUrl, // Will be null if APK
-            //        apkUrl: "S3_APK_URL_HERE", // Will be null if website
-            //        developerName: formData.developerName,
-            //        developerEmail: formData.developerEmail,
-            //        submissionDate: formData.submissionDate,
-            //        status: formData.status,
-            //        appLogoUrl: "S3_LOGO_URL_HERE",
-            //        appImageUrls: ["S3_SCREENSHOT_URL_1", "S3_SCREENSHOT_URL_2"]
-            //      }
-            // 3. Save this metadata to Appwrite.
-            //    - Use APPWRITE_PROJECT_ID, APPWRITE_DATABASE_ID, APPWRITE_COLLECTION_ID.
-            //    - Example Appwrite SDK call (conceptual):
-            //      import { Client, Databases } from 'appwrite';
-            //      const client = new Client().setEndpoint('YOUR_APPWRITE_ENDPOINT').setProject(APPWRITE_PROJECT_ID);
-            //      const databases = new Databases(client);
-            //      await databases.createDocument(APPWRITE_DATABASE_ID, APPWRITE_COLLECTION_ID, 'unique()', metadata);
+                let downloadLink = '#';
+                let downloadText = 'Details'; // Default text if no direct download
+                if (app.distributionMethod === 'apk' && app.apkUrl) {
+                    downloadLink = app.apkUrl;
+                    downloadText = 'Download APK';
+                } else if (app.distributionMethod === 'website' && app.websiteUrl) {
+                    downloadLink = app.websiteUrl;
+                    downloadText = 'Visit Website';
+                }
 
-            // Simulate success for demonstration
-            console.log("Simulating successful submission...");
-            showMessageBox('App submitted successfully! We will review it shortly.', 'success');
+                card.innerHTML = `
+                    <img src="${app.appLogoUrl || 'https://placehold.co/128x128/a020f0/ffffff?text=App'}" alt="App Logo" class="w-32 h-32 rounded-full mb-4 border-4 border-purple-text object-cover">
+                    <h3 class="text-xl font-bold mb-2">${app.appName}</h3>
+                    <p class="text-gray-400 text-sm mb-4 truncate w-full px-2">${app.shortDescription}</p>
+                    <button class="purple-gradient-button text-white px-4 py-2 rounded-lg font-semibold app-card-download" onclick="window.open('${downloadLink}', '_blank')">
+                        ${downloadText}
+                        <span class="download-icon inline-block ml-2">&#x2193;</span>
+                    </button>
+                `;
+                appListingsContainer.appendChild(card);
+            });
+        }
 
-            // Optionally, reset form after successful submission
-            submissionForm.reset();
-            // Re-initialize dynamic sections and clear errors
-            apkUploadSection.classList.remove('hidden');
-            websiteUrlSection.classList.add('hidden');
-            appLogoInput.value = '';
-            appScreenshotsInput.value = '';
-            document.getElementById('apk-file').value = '';
-            logoError.classList.add('hidden');
-            screenshotsError.classList.add('hidden');
-            updateCharCounts();
-            // closeModalButton.click(); // Auto-close modal
-        });
-
-        // --- Search Bar Functionality ---
+        // Search Bar Functionality
         searchBar.addEventListener('input', () => {
             const searchTerm = searchBar.value.toLowerCase();
+            const cards = document.querySelectorAll('.app-card');
+            let visibleCount = 0;
 
-            appCards.forEach(card => {
-                const appName = card.dataset.appName.toLowerCase();
-                const appCategory = card.dataset.appCategory.toLowerCase();
+            cards.forEach(card => {
+                const appName = card.dataset.appName;
+                const appCategory = card.dataset.appCategory;
 
                 if (appName.includes(searchTerm) || appCategory.includes(searchTerm)) {
-                    card.style.display = 'flex'; // Show the card
+                    card.style.display = 'flex';
+                    visibleCount++;
                 } else {
-                    card.style.display = 'none'; // Hide the card
+                    card.style.display = 'none';
                 }
             });
+
+            if (visibleCount === 0 && searchTerm !== '') {
+                noAppsMessage.textContent = 'No matching apps found.';
+                noAppsMessage.classList.remove('hidden');
+            } else if (visibleCount === 0) { // No apps at all
+                 noAppsMessage.textContent = 'No approved apps found.';
+                 noAppsMessage.classList.remove('hidden');
+            } else {
+                noAppsMessage.classList.add('hidden');
+            }
         });
+
+        // Initial fetch of approved applications when the page loads
+        document.addEventListener('DOMContentLoaded', fetchAndDisplayApprovedApps);
     </script>
 </body>
 </html>
