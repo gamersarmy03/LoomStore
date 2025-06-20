@@ -5,58 +5,113 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LoomStore</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #000000; color: #ffffff; }
-        .card { background-color: #1a1a1a; }
-        .btn-purple { background-color: #a020f0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+        }
+        .card {
+            background-color: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(160, 32, 240, 0.2);
+        }
+        .btn-purple {
+            background-color: #a020f0;
+            transition: background-color 0.3s ease;
+        }
+        .btn-purple:hover {
+            background-color: #8a1bc4;
+        }
     </style>
 </head>
-<body>
-    <div class="container mx-auto p-4">
-        <div class="flex justify-between items-center mb-4">
-            <h1 class="text-3xl font-bold">LoomStore</h1>
-            <a href="developer.html" class="btn-purple text-white font-bold py-2 px-4 rounded">Developer</a>
+<body class="bg-black">
+    <header class="p-4 md:p-6 flex justify-between items-center border-b border-gray-800">
+        <h1 class="text-3xl font-bold text-white">Loom<span class="text-purple-500">Store</span></h1>
+        <div class="flex items-center space-x-4">
+            <input type="text" id="searchInput" placeholder="Search apps..." class="hidden md:block bg-gray-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <a href="developer.html" class="btn-purple text-white font-semibold px-4 py-2 rounded-lg shadow-md">
+                Developer
+            </a>
         </div>
-        <div id="app-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            </div>
-    </div>
-    <script type="module">
-        import { Client, Databases, Query } from "https://cdn.jsdelivr.net/npm/appwrite@13.0.0/dist/browser/appwrite.min.js";
+    </header>
 
-        const client = new Client();
-        client
-            .setEndpoint('https://cloud.appwrite.io/v1')
-            .setProject('68528057001314063369');
+    <main class="p-4 md:p-8">
+        <div class="mb-8 md:hidden">
+             <input type="text" id="mobileSearchInput" placeholder="Search apps..." class="w-full bg-gray-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+        </div>
 
-        const databases = new Databases(client);
+        <section id="apps-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            <!-- App cards will be dynamically inserted here -->
+        </section>
 
-        async function getApprovedApps() {
-            try {
-                const response = await databases.listDocuments(
-                    '6852a77b0029f40ae7a4',
-                    '6852a7a3001e4713b6f6',
-                    [Query.equal('status', 'approved')]
-                );
-                const apps = response.documents;
-                const appGrid = document.getElementById('app-grid');
-                appGrid.innerHTML = ''; 
+        <div id="no-apps" class="hidden text-center py-20">
+            <h2 class="text-2xl font-semibold text-gray-400">No apps found.</h2>
+            <p class="text-gray-500">Check back later or submit your own app!</p>
+        </div>
+    </main>
+
+    <script>
+        // Mock data for demonstration
+        const mockApps = [
+            { appName: 'PhotoEditor Pro', shortDescription: 'Edit photos like a pro.', appLogoUrl: 'https://placehold.co/128x128/a020f0/ffffff?text=P', status: 'approved' },
+            { appName: 'MusicStream', shortDescription: 'Unlimited music streaming.', appLogoUrl: 'https://placehold.co/128x128/a020f0/ffffff?text=M', status: 'approved' },
+            { appName: 'TaskMaster', shortDescription: 'Organize your daily tasks.', appLogoUrl: 'https://placehold.co/128x128/a020f0/ffffff?text=T', status: 'approved' },
+            { appName: 'CloudDrive', shortDescription: 'Secure cloud storage.', appLogoUrl: 'https://placehold.co/128x128/a020f0/ffffff?text=C', status: 'approved' },
+            { appName: 'CodeRunner', shortDescription: 'Mobile code editor.', appLogoUrl: 'https://placehold.co/128x128/a020f0/ffffff?text=C', status: 'approved' },
+            { appName: 'FitTrack', shortDescription: 'Your personal fitness companion.', appLogoUrl: 'https://placehold.co/128x128/a020f0/ffffff?text=F', status: 'approved' },
+            { appName: 'RecipeFinder', shortDescription: 'Discover new recipes.', appLogoUrl: 'https://placehold.co/128x128/a020f0/ffffff?text=R', status: 'approved' },
+            { appName: 'WeatherNow', shortDescription: 'Real-time weather updates.', appLogoUrl: 'https://placehold.co/128x128/a020f0/ffffff?text=W', status: 'approved' },
+             { appName: 'GameZone', shortDescription: 'A world of mobile games.', appLogoUrl: 'https://placehold.co/128x128/a020f0/ffffff?text=G', status: 'approved' },
+            { appName: 'NewsFeed', shortDescription: 'Latest news headlines.', appLogoUrl: 'https://placehold.co/128x128/a020f0/ffffff?text=N', status: 'approved' },
+        ];
+        
+        const appsGrid = document.getElementById('apps-grid');
+        const noAppsMessage = document.getElementById('no-apps');
+        const searchInput = document.getElementById('searchInput');
+        const mobileSearchInput = document.getElementById('mobileSearchInput');
+
+        function renderApps(apps) {
+            appsGrid.innerHTML = '';
+            if (apps.length === 0) {
+                noAppsMessage.classList.remove('hidden');
+            } else {
+                noAppsMessage.classList.add('hidden');
                 apps.forEach(app => {
-                    const appCard = `
-                        <div class="card p-4 rounded-lg shadow-lg">
-                            <img src="${app.appLogoUrl}" alt="${app.appName} Logo" class="w-16 h-16 object-cover rounded-md mb-4">
-                            <h2 class="text-xl font-bold">${app.appName}</h2>
-                            <p class="text-sm text-gray-400 mb-2">${app.shortDescription}</p>
-                            <a href="${app.apkUrl || app.websiteUrl}" class="btn-purple text-white font-bold py-2 px-4 rounded">Download</a>
-                        </div>
-                    `;
-                    appGrid.innerHTML += appCard;
+                    if (app.status === 'approved') {
+                        const card = document.createElement('div');
+                        card.className = 'card rounded-lg overflow-hidden shadow-lg flex flex-col items-center text-center p-4';
+                        card.innerHTML = `
+                            <img class="w-24 h-24 rounded-lg mb-4" src="${app.appLogoUrl}" alt="${app.appName} Logo" onerror="this.src='https://placehold.co/128x128/1a1a1a/ffffff?text=Error'">
+                            <h3 class="font-semibold text-lg mb-1">${app.appName}</h3>
+                            <p class="text-gray-400 text-sm flex-grow">${app.shortDescription}</p>
+                            <button class="mt-4 w-full btn-purple text-white font-semibold px-4 py-2 rounded-lg">Download</button>
+                        `;
+                        appsGrid.appendChild(card);
+                    }
                 });
-            } catch (error) {
-                console.error('Failed to fetch approved apps:', error);
             }
         }
+        
+        function filterApps() {
+            const searchTerm = this.value.toLowerCase();
+            const filteredApps = mockApps.filter(app => 
+                app.appName.toLowerCase().includes(searchTerm) ||
+                app.shortDescription.toLowerCase().includes(searchTerm)
+            );
+            renderApps(filteredApps);
+        }
 
-        getApprovedApps();
+        searchInput.addEventListener('input', filterApps);
+        mobileSearchInput.addEventListener('input', filterApps);
+
+        // Initial render
+        renderApps(mockApps.filter(app => app.status === 'approved'));
     </script>
 </body>
 </html>
