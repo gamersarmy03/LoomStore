@@ -3,157 +3,498 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Console - LoomStore</title>
+    <title>LoomStore - Admin Console</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        // Tailwind CSS configuration for custom colors and font
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1a1a1a', // Deep black
+                        secondary: '#8a2be2', // BlueViolet for purple accent
+                        accent: '#a78bfa', // Purple-400 for lighter accents
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
     <style>
+        /* Custom styles for the Inter font and general body styling */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #000000;
-            color: #ffffff;
+            background-color: #1a1a1a; /* Primary black background */
+            color: #ffffff; /* White text for contrast */
         }
-        .admin-card {
-            background-color: #1a1a1a;
-            border: 1px solid #2a2a2a;
+        /* Style for scrollbar to match theme */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-        .btn-approve {
-            background-color: #22c55e;
-            color: white;
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
         }
-        .btn-approve:hover {
-            background-color: #16a34a;
+        ::-webkit-scrollbar-thumb {
+            background: #8a2be2;
+            border-radius: 4px;
         }
-        .btn-reject {
-            background-color: #ef4444;
-            color: white;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a78bfa;
         }
-        .btn-reject:hover {
-            background-color: #dc2626;
+        .modal {
+            background-color: rgba(0, 0, 0, 0.75);
+        }
+        .loader {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #8a2be2; /* Purple */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body class="bg-black">
-
-    <header class="p-4 md:p-6 flex justify-between items-center border-b border-gray-800">
-        <h1 class="text-3xl font-bold text-white">Admin <span class="text-purple-500">Console</span></h1>
-        <a href="main.html" class="text-white font-semibold px-4 py-2 rounded-lg border border-purple-500 hover:bg-purple-500 transition-colors">
-            Back to Store
+<body class="min-h-screen flex flex-col">
+    <!-- Header Section -->
+    <header class="bg-primary shadow-lg p-4 md:p-6 flex justify-between items-center rounded-b-lg">
+        <h1 class="text-3xl md:text-4xl font-bold text-secondary">LoomStore Console</h1>
+        <a href="home.html" class="px-4 py-2 bg-secondary text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition duration-300 transform hover:scale-105">
+            Back to Home
         </a>
     </header>
 
-    <main class="p-4 md:p-8">
-        <h2 class="text-2xl font-bold mb-6">Pending Submissions</h2>
-        <div id="submissions-container" class="space-y-6">
-            <!-- Submission cards will be dynamically inserted here -->
-        </div>
-         <div id="no-submissions" class="hidden text-center py-20">
-            <h2 class="text-2xl font-semibold text-gray-400">No pending submissions.</h2>
-            <p class="text-gray-500">All caught up!</p>
+    <!-- Main Content Section -->
+    <main class="flex-grow container mx-auto p-4 md:p-8">
+        <h2 class="text-2xl md:text-3xl font-bold text-accent mb-6 md:mb-8 text-center">Pending App Submissions</h2>
+        <div id="app-list" class="space-y-6">
+            <!-- App submission cards will be loaded here -->
+            <div id="loading-message" class="text-center text-accent text-lg hidden">
+                Loading submissions...
+            </div>
+            <div id="no-submissions-message" class="text-center text-gray-500 text-lg hidden">
+                No pending app submissions.
+            </div>
+            <div id="error-message" class="text-center text-red-500 text-lg hidden">
+                Failed to load submissions. Please try again.
+            </div>
         </div>
     </main>
 
-    <script>
-        // Mock data for demonstration
-        const mockSubmissions = [
-            {
-                id: '1',
-                appName: 'Creative Suite',
-                appLogoUrl: 'https://placehold.co/128x128/a020f0/ffffff?text=C',
-                shortDescription: 'A new way to be creative.',
-                longDescription: 'This suite includes a photo editor, video editor, and a drawing tool. All you need for your creative projects.',
-                appCategory: 'Productivity',
-                distributionMethod: 'apk',
-                websiteUrl: null,
-                apkUrl: 'files/creative-suite.apk',
-                developerName: 'Creative Inc.',
-                submissionDate: new Date().toISOString(),
-                status: 'pending'
-            },
-            {
-                id: '2',
-                appName: 'SocialConnect',
-                appLogoUrl: 'https://placehold.co/128x128/a020f0/ffffff?text=S',
-                shortDescription: 'Connect with friends.',
-                longDescription: 'A decentralized social media platform that respects your privacy.',
-                appCategory: 'Social',
-                distributionMethod: 'website',
-                websiteUrl: 'https://socialconnect.example.com',
-                apkUrl: null,
-                developerName: 'Privacy First',
-                submissionDate: new Date().toISOString(),
-                status: 'pending'
+    <!-- Review Modal -->
+    <div id="reviewModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-primary p-6 md:p-8 rounded-lg shadow-xl max-w-2xl w-full border border-secondary relative">
+            <button id="closeReviewModal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
+            <h3 class="text-2xl font-bold text-accent mb-4 text-center">App Review</h3>
+            <div id="modal-content" class="space-y-4 text-gray-300">
+                <!-- App details will be dynamically loaded here -->
+            </div>
+            <div class="mt-6 flex justify-center space-x-4">
+                <button id="acceptBtn" class="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300">Accept</button>
+                <button id="rejectBtn" class="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition duration-300">Reject</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- APK Upload Modal -->
+    <div id="apkUploadModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-primary p-6 md:p-8 rounded-lg shadow-xl max-w-md w-full border border-secondary relative">
+            <button id="closeApkUploadModal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
+            <h3 class="text-2xl font-bold text-accent mb-4 text-center">Upload APK for Approval</h3>
+            <form id="apk-upload-form" class="space-y-4">
+                <div>
+                    <label for="adminApkFile" class="block text-accent text-sm font-bold mb-2">Upload APK File</label>
+                    <input type="file" id="adminApkFile" name="adminApkFile" accept=".apk" class="w-full px-3 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-accent" required>
+                </div>
+                <button type="submit" class="w-full px-6 py-3 bg-secondary text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition duration-300">
+                    Upload & Approve
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading and Message Modals (reused from developer.html) -->
+    <div id="loadingModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-xl text-center">
+            <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16 mb-4 mx-auto"></div>
+            <p class="text-white text-lg">Processing...</p>
+        </div>
+    </div>
+
+    <div id="messageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-xl text-center max-w-sm w-full">
+            <p id="messageText" class="text-white text-lg mb-4"></p>
+            <button id="closeMessageModal" class="px-5 py-2 bg-secondary text-white font-semibold rounded-lg hover:bg-purple-700 transition duration-300">Close</button>
+        </div>
+    </div>
+
+
+    <!-- Footer Section -->
+    <footer class="bg-primary text-gray-400 text-center p-4 md:p-6 mt-8 rounded-t-lg shadow-lg">
+        <p>&copy; 2025 LoomStore Console. All rights reserved.</p>
+    </footer>
+
+    <!-- Firebase and Appwrite SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { Client, Databases, ID, Query } from 'https://unpkg.com/appwrite@13.0.0/dist/esm/sdk.js';
+
+        // Firebase Configuration (provided by the Canvas environment)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'; // Fallback for local testing
+
+        let app, auth, db, userId; // Firebase instances (db is Firestore, not used for LoomStore app data here)
+
+        // Initialize Firebase and handle authentication
+        async function initFirebase() {
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+
+                // Sign in with custom token if available, otherwise anonymously
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                    console.log("Firebase signed in with custom token.");
+                } else {
+                    await signInAnonymously(auth);
+                    console.log("Firebase signed in anonymously.");
+                }
+
+                // Listen for auth state changes to get the current user ID
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log("Admin User ID:", userId);
+                        fetchPendingApps(); // Fetch apps only after auth is ready
+                    } else {
+                        userId = crypto.randomUUID(); // Fallback if no authenticated user
+                        console.log("No authenticated user, using random UUID:", userId);
+                        // In a real admin console, you'd want proper authentication
+                        showMessageModal("Authentication failed. This console requires admin access.", "error");
+                        document.getElementById('loading-message').classList.add('hidden');
+                        document.getElementById('error-message').classList.remove('hidden');
+                    }
+                });
+
+            } catch (error) {
+                console.error("Firebase initialization or authentication failed:", error);
+                showMessageModal("Error initializing console. Please try again.", "error");
             }
-        ];
+        }
 
-        const submissionsContainer = document.getElementById('submissions-container');
-        const noSubmissionsMessage = document.getElementById('no-submissions');
+        // Appwrite Configuration
+        const APPWRITE_ENDPOINT = 'https://cloud.appwrite.io/v1'; // Default Appwrite Cloud endpoint
+        const APPWRITE_PROJECT_ID = '68528057001314063369';
+        const APPWRITE_DATABASE_ID = '6852a77b0029f40ae7a4';
+        const APPWRITE_COLLECTION_ID = '6852a7a3001e4713b6f6';
 
-        function renderSubmissions(submissions) {
-            submissionsContainer.innerHTML = '';
-            const pendingSubmissions = submissions.filter(s => s.status === 'pending');
-            
-            if (pendingSubmissions.length === 0) {
-                noSubmissionsMessage.classList.remove('hidden');
+        const client = new Client();
+        client
+            .setEndpoint(APPWRITE_ENDPOINT)
+            .setProject(APPWRITE_PROJECT_ID);
+
+        const databases = new Databases(client);
+
+        // S3 Archive.org Credentials and Endpoint (reused from developer.html)
+        // IMPORTANT: Storing S3 credentials directly in client-side code is HIGHLY INSECURE.
+        // In a real production environment, use a backend service to generate pre-signed URLs
+        // for uploads to protect your AWS Access Key and Secret Key.
+        const S3_ACCESS_KEY = 'cFDtuIpumfXlW76M';
+        const S3_SECRET_KEY = 'NVbTrPoAOnJYzeMJ';
+        const S3_ENDPOINT = 'https://archive.org'; // See notes in developer.html for S3 simulation.
+
+        /**
+         * Simulates an S3 upload.
+         * @param {File} file - The file to upload.
+         * @param {string} key - The S3 object key (path/filename).
+         * @returns {Promise<string>} - The public URL of the uploaded file.
+         */
+        async function uploadFileToS3(file, key) {
+            const uploadUrl = `${S3_ENDPOINT}/${appId}/loomstore-assets/${key}`;
+            try {
+                const response = await fetch(uploadUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': file.type,
+                    },
+                    body: file,
+                });
+
+                if (response.ok) {
+                    return uploadUrl;
+                } else {
+                    const errorText = await response.text();
+                    console.error(`S3 upload failed for ${key}:`, response.status, response.statusText, errorText);
+                    throw new Error(`S3 upload failed: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error("Error during S3 upload:", error);
+                throw error;
+            }
+        }
+
+        // DOM Elements
+        const appListDiv = document.getElementById('app-list');
+        const loadingMessage = document.getElementById('loading-message');
+        const noSubmissionsMessage = document.getElementById('no-submissions-message');
+        const errorMessage = document.getElementById('error-message');
+
+        // Review Modal Elements
+        const reviewModal = document.getElementById('reviewModal');
+        const closeReviewModal = document.getElementById('closeReviewModal');
+        const modalContent = document.getElementById('modal-content');
+        const acceptBtn = document.getElementById('acceptBtn');
+        const rejectBtn = document.getElementById('rejectBtn');
+
+        // APK Upload Modal Elements
+        const apkUploadModal = document.getElementById('apkUploadModal');
+        const closeApkUploadModal = document.getElementById('closeApkUploadModal');
+        const adminApkFile = document.getElementById('adminApkFile');
+        const apkUploadForm = document.getElementById('apk-upload-form');
+
+        // Loading and Message Modals
+        const loadingModal = document.getElementById('loadingModal');
+        const messageModal = document.getElementById('messageModal');
+        const messageText = document.getElementById('messageText');
+        const closeMessageModal = document.getElementById('closeMessageModal');
+
+        let currentAppIdToReview = null; // Stores the document ID of the app being reviewed
+
+        // Functions to show/hide modals
+        function showLoadingModal() {
+            loadingModal.classList.remove('hidden');
+        }
+
+        function hideLoadingModal() {
+            loadingModal.classList.add('hidden');
+        }
+
+        function showMessageModal(message, type = "info") {
+            messageText.textContent = message;
+            if (type === "error") {
+                messageText.classList.add('text-red-500');
+                messageText.classList.remove('text-white');
             } else {
-                 noSubmissionsMessage.classList.add('hidden');
+                messageText.classList.remove('text-red-500');
+                messageText.classList.add('text-white');
             }
+            messageModal.classList.remove('hidden');
+        }
 
-            pendingSubmissions.forEach(sub => {
-                const card = document.createElement('div');
-                card.id = `submission-${sub.id}`;
-                card.className = 'admin-card rounded-lg p-6 shadow-md flex flex-col md:flex-row gap-6';
+        function hideMessageModal() {
+            messageModal.classList.add('hidden');
+        }
 
-                card.innerHTML = `
-                    <div class="flex-shrink-0">
-                        <img class="w-24 h-24 rounded-lg" src="${sub.appLogoUrl}" alt="${sub.appName} Logo" onerror="this.src='https://placehold.co/128x128/1a1a1a/ffffff?text=Error'">
+        closeMessageModal.addEventListener('click', hideMessageModal);
+        closeReviewModal.addEventListener('click', () => reviewModal.classList.add('hidden'));
+        closeApkUploadModal.addEventListener('click', () => apkUploadModal.classList.add('hidden'));
+
+        /**
+         * Fetches and displays pending app submissions.
+         */
+        async function fetchPendingApps() {
+            appListDiv.innerHTML = ''; // Clear existing listings
+            loadingMessage.classList.remove('hidden');
+            noSubmissionsMessage.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+
+            try {
+                // Query for documents where status is 'pending'
+                const response = await databases.listDocuments(
+                    APPWRITE_DATABASE_ID,
+                    APPWRITE_COLLECTION_ID,
+                    [
+                        Query.equal('status', 'pending'),
+                        Query.orderDesc('submissionDate')
+                    ]
+                );
+
+                if (response.documents.length === 0) {
+                    noSubmissionsMessage.classList.remove('hidden');
+                } else {
+                    response.documents.forEach(app => {
+                        const appCard = `
+                            <div class="bg-gray-800 p-4 rounded-lg shadow-xl flex flex-col md:flex-row items-center justify-between gap-4" data-app-id="${app.$id}">
+                                <div class="flex items-center gap-4">
+                                    <img src="${app.appLogoUrl || 'https://placehold.co/80x80/8a2be2/ffffff?text=Logo'}" alt="${app.appName} Logo" class="w-20 h-20 rounded-full object-cover border-2 border-accent">
+                                    <div>
+                                        <h3 class="text-xl font-bold text-white">${app.appName} <span class="text-gray-400 text-sm">(${app.appCategory})</span></h3>
+                                        <p class="text-gray-400 text-sm">Developer: ${app.developerName}</p>
+                                        <p class="text-gray-500 text-xs">Submitted: ${new Date(app.submissionDate).toLocaleDateString()}</p>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col md:flex-row gap-2">
+                                    <button class="view-details-btn px-4 py-2 bg-accent text-white rounded-lg hover:bg-purple-600 transition duration-300" data-app-id="${app.$id}">
+                                        View Details
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        appListDiv.innerHTML += appCard;
+                    });
+
+                    // Attach event listeners to "View Details" buttons
+                    document.querySelectorAll('.view-details-btn').forEach(button => {
+                        button.addEventListener('click', (event) => {
+                            const appId = event.target.dataset.appId;
+                            currentAppIdToReview = appId;
+                            showAppDetailsInModal(appId);
+                        });
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching pending apps:", error);
+                errorMessage.classList.remove('hidden');
+            } finally {
+                loadingMessage.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Shows the app details in a modal for review.
+         * @param {string} appId - The ID of the app document to display.
+         */
+        async function showAppDetailsInModal(appId) {
+            showLoadingModal();
+            try {
+                const app = await databases.getDocument(
+                    APPWRITE_DATABASE_ID,
+                    APPWRITE_COLLECTION_ID,
+                    appId
+                );
+
+                modalContent.innerHTML = `
+                    <div class="flex flex-col items-center mb-4">
+                        <img src="${app.appLogoUrl || 'https://placehold.co/100x100/8a2be2/ffffff?text=Logo'}" alt="${app.appName} Logo" class="w-24 h-24 rounded-full object-cover border-4 border-accent mb-4">
+                        <h4 class="text-xl font-bold text-white">${app.appName}</h4>
+                        <p class="text-gray-400 text-sm">${app.developerName} (${app.developerEmail})</p>
                     </div>
-                    <div class="flex-grow">
-                        <h3 class="text-xl font-bold">${sub.appName}</h3>
-                        <p class="text-sm text-gray-400 mb-2">by ${sub.developerName} | Category: ${sub.appCategory}</p>
-                        <p class="mb-1"><strong>Short Desc:</strong> ${sub.shortDescription}</p>
-                        <p class="mb-4 text-gray-300"><strong>Long Desc:</strong> ${sub.longDescription}</p>
-                        
-                        ${sub.distributionMethod === 'website' ?
-                            `<p><strong>Website:</strong> <a href="${sub.websiteUrl}" target="_blank" class="text-purple-400 hover:underline">${sub.websiteUrl}</a></p>` :
-                            `<p><strong>APK:</strong> <span class="text-gray-300">${sub.apkUrl}</span></p>`
-                        }
-                         ${sub.apkUrl === null ? 
-                            `<div class="mt-4">
-                                <label for="apkUpload-${sub.id}" class="text-sm font-medium">Upload APK for Approval:</label>
-                                <input type="file" id="apkUpload-${sub.id}" class="mt-1 text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"/>
-                            </div>` : ''
-                        }
-                    </div>
-                    <div class="flex flex-col space-y-3 justify-center">
-                        <button class="btn-approve font-semibold px-4 py-2 rounded-lg" onclick="handleApprove('${sub.id}')">Approve</button>
-                        <button class="btn-reject font-semibold px-4 py-2 rounded-lg" onclick="handleReject('${sub.id}')">Reject</button>
+                    <p><strong class="text-accent">Short Description:</strong> ${app.shortDescription}</p>
+                    <p><strong class="text-accent">Long Description:</strong> ${app.longDescription}</p>
+                    <p><strong class="text-accent">Category:</strong> ${app.appCategory}</p>
+                    <p><strong class="text-accent">Distribution:</strong> ${app.distributionMethod}</p>
+                    ${app.websiteUrl ? `<p><strong class="text-accent">Website:</strong> <a href="${app.websiteUrl}" target="_blank" class="text-blue-400 hover:underline">${app.websiteUrl}</a></p>` : ''}
+                    ${app.apkUrl ? `<p><strong class="text-accent">APK URL:</strong> <a href="${app.apkUrl}" target="_blank" class="text-blue-400 hover:underline">Download APK</a></p>` : ''}
+                    <div class="mt-4">
+                        <h5 class="text-accent text-lg font-semibold mb-2">App Screenshots:</h5>
+                        <div class="grid grid-cols-2 gap-2">
+                            ${app.appImageUrls.map(url => `<img src="${url}" class="w-full h-auto object-cover rounded-md border-2 border-gray-600" alt="App Screenshot">`).join('')}
+                        </div>
                     </div>
                 `;
-                submissionsContainer.appendChild(card);
-            });
+
+                // Set up event listeners for Accept/Reject buttons
+                acceptBtn.onclick = () => handleAppStatusChange(appId, 'accepted');
+                rejectBtn.onclick = () => handleAppStatusChange(appId, 'rejected');
+
+                // If distribution method is 'website' and no APK yet, enable admin APK upload flow
+                if (app.distributionMethod === 'website' && !app.apkUrl) {
+                    acceptBtn.onclick = () => {
+                        reviewModal.classList.add('hidden'); // Hide review modal
+                        apkUploadModal.classList.remove('hidden'); // Show APK upload modal
+                        currentAppIdToReview = appId; // Ensure currentAppId is set for the APK upload
+                    };
+                    acceptBtn.textContent = "Upload APK & Approve";
+                } else {
+                    acceptBtn.textContent = "Accept";
+                }
+
+                reviewModal.classList.remove('hidden');
+            } catch (error) {
+                console.error("Error fetching app details:", error);
+                showMessageModal("Failed to load app details. Please try again.", "error");
+            } finally {
+                hideLoadingModal();
+            }
         }
 
-        function handleApprove(id) {
-            console.log(`Approving app ${id}`);
-            // In a real app, update status in Appwrite
-            // and potentially upload the APK if provided by admin.
-            const card = document.getElementById(`submission-${id}`);
-            card.style.opacity = '0.5';
-            card.innerHTML += '<p class="text-center font-bold text-green-400 mt-4">Approved</p>';
-            setTimeout(() => card.remove(), 1000);
+        /**
+         * Handles updating the app status (accept/reject) in Appwrite.
+         * @param {string} appId - The ID of the app document.
+         * @param {string} status - 'accepted' or 'rejected'.
+         */
+        async function handleAppStatusChange(appId, status) {
+            showLoadingModal();
+            try {
+                await databases.updateDocument(
+                    APPWRITE_DATABASE_ID,
+                    APPWRITE_COLLECTION_ID,
+                    appId,
+                    {
+                        status: status,
+                        reviewedBy: userId, // Record who reviewed it
+                        reviewDate: new Date().toISOString()
+                    }
+                );
+                hideLoadingModal();
+                reviewModal.classList.add('hidden'); // Close review modal
+                showMessageModal(`App "${status}" successfully!`, "success");
+                fetchPendingApps(); // Refresh the list
+            } catch (error) {
+                console.error(`Error updating app status to ${status}:`, error);
+                hideLoadingModal();
+                showMessageModal(`Failed to change app status: ${error.message}`, "error");
+            }
         }
 
-        function handleReject(id) {
-            console.log(`Rejecting app ${id}`);
-             // In a real app, update status in Appwrite
-            const card = document.getElementById(`submission-${id}`);
-            card.style.opacity = '0.5';
-            card.innerHTML += '<p class="text-center font-bold text-red-400 mt-4">Rejected</p>';
-            setTimeout(() => card.remove(), 1000);
-        }
+        // Handle APK upload from admin console
+        apkUploadForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            showLoadingModal();
 
-        // Initial render
-        renderSubmissions(mockSubmissions);
+            const apkFile = adminApkFile.files[0];
+            if (!apkFile) {
+                hideLoadingModal();
+                showMessageModal("Please select an APK file to upload.", "error");
+                return;
+            }
+
+            if (!currentAppIdToReview) {
+                hideLoadingModal();
+                showMessageModal("No app selected for APK upload.", "error");
+                return;
+            }
+
+            try {
+                const apkKey = `apks/${ID.unique()}-${apkFile.name}`;
+                const apkUrl = await uploadFileToS3(apkFile, apkKey);
+
+                // Update the app document with the new APK URL and change status to accepted
+                await databases.updateDocument(
+                    APPWRITE_DATABASE_ID,
+                    APPWRITE_COLLECTION_ID,
+                    currentAppIdToReview,
+                    {
+                        apkUrl: apkUrl,
+                        status: 'accepted',
+                        reviewedBy: userId,
+                        reviewDate: new Date().toISOString()
+                    }
+                );
+
+                hideLoadingModal();
+                apkUploadModal.classList.add('hidden'); // Close APK upload modal
+                showMessageModal("APK uploaded and app approved successfully!", "success");
+                apkUploadForm.reset(); // Clear form
+                currentAppIdToReview = null; // Reset
+                fetchPendingApps(); // Refresh the list
+            } catch (error) {
+                console.error("Error uploading APK or approving app:", error);
+                hideLoadingModal();
+                showMessageModal(`Failed to upload APK and approve app: ${error.message}`, "error");
+            }
+        });
+
+        // Initialize Firebase on window load. This will trigger fetching pending apps.
+        window.onload = initFirebase;
     </script>
 </body>
 </html>
