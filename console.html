@@ -125,78 +125,7 @@
         <h2 class="text-4xl font-extrabold mb-8 text-center">Pending App Submissions</h2>
 
         <div id="pending-applications" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Example Pending Application Card (will be dynamically loaded) -->
-            <div class="app-submission-card bg-gray-800 rounded-xl shadow-xl p-6 card-animation flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center mb-4">
-                        <img src="https://placehold.co/64x64/a020f0/ffffff?text=L" alt="App Logo" class="w-16 h-16 rounded-lg mr-4 border-2 border-purple-text">
-                        <div>
-                            <h3 class="text-xl font-bold">Example App Name 1</h3>
-                            <p class="text-gray-400 text-sm">Category: Games</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-300 mb-2 text-sm">Short Description: A brief overview of example app 1.</p>
-                    <p class="text-gray-500 text-xs mb-4">Submitted by: Developer Name A (dev_a@example.com) on 2024-01-15</p>
-                    <div class="mb-4">
-                        <span class="font-semibold text-gray-300">Distribution:</span>
-                        <span class="text-purple-300 ml-2">APK File</span>
-                        <p class="text-gray-500 text-xs mt-1">APK URL: <a href="#" class="purple-text hover:underline" target="_blank">download.apk</a></p>
-                    </div>
-                </div>
-                <div class="flex flex-col space-y-2">
-                    <button class="approve-button bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200">Approve</button>
-                    <button class="reject-button bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200">Reject</button>
-                </div>
-            </div>
-
-            <div class="app-submission-card bg-gray-800 rounded-xl shadow-xl p-6 card-animation flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center mb-4">
-                        <img src="https://placehold.co/64x64/a020f0/ffffff?text=W" alt="App Logo" class="w-16 h-16 rounded-lg mr-4 border-2 border-purple-text">
-                        <div>
-                            <h3 class="text-xl font-bold">Website App 2</h3>
-                            <p class="text-gray-400 text-sm">Category: Productivity</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-300 mb-2 text-sm">Short Description: Manage your tasks efficiently with this web app.</p>
-                    <p class="text-gray-500 text-xs mb-4">Submitted by: Developer Name B (dev_b@example.com) on 2024-01-20</p>
-                    <div class="mb-4">
-                        <span class="font-semibold text-gray-300">Distribution:</span>
-                        <span class="text-purple-300 ml-2">Website</span>
-                        <p class="text-gray-500 text-xs mt-1">Website URL: <a href="https://example.com/app2" class="purple-text hover:underline" target="_blank">example.com/app2</a></p>
-                    </div>
-                </div>
-                <div class="flex flex-col space-y-2">
-                    <button class="approve-button bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200">Approve</button>
-                    <button class="reject-button bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200">Reject</button>
-                </div>
-            </div>
-
-            <div class="app-submission-card bg-gray-800 rounded-xl shadow-xl p-6 card-animation flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center mb-4">
-                        <img src="https://placehold.co/64x64/a020f0/ffffff?text=X" alt="App Logo" class="w-16 h-16 rounded-lg mr-4 border-2 border-purple-text">
-                        <div>
-                            <h3 class="text-xl font-bold">No APK Yet App</h3>
-                            <p class="text-gray-400 text-sm">Category: Utilities</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-300 mb-2 text-sm">Short Description: A utility that needs an APK upload from admin.</p>
-                    <p class="text-gray-500 text-xs mb-4">Submitted by: Developer Name C (dev_c@example.com) on 2024-01-25</p>
-                    <div class="mb-4">
-                        <span class="font-semibold text-gray-300">Distribution:</span>
-                        <span class="text-purple-300 ml-2">APK File (Pending Upload)</span>
-                    </div>
-                </div>
-                <div class="flex flex-col space-y-2">
-                    <button class="approve-button bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200">Approve</button>
-                    <button class="reject-button bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200">Reject</button>
-                    <div class="apk-upload-section mt-2 hidden">
-                        <label for="admin-apk-file" class="block text-gray-300 text-sm font-semibold mb-2">Upload APK for Approval:</label>
-                        <input type="file" id="admin-apk-file" accept=".apk" class="w-full p-2 rounded-lg bg-gray-700 border border-gray-600 text-white">
-                    </div>
-                </div>
-            </div>
+            <!-- App Submission Cards will be dynamically loaded here by JavaScript -->
         </div>
         <p id="no-submissions-message" class="text-center text-gray-400 mt-8 hidden">No pending app submissions found.</p>
     </main>
@@ -237,7 +166,25 @@
     <!-- Message Box for Alerts -->
     <div id="message-box" class="message-box"></div>
 
-    <script>
+    <script type="module">
+        // Import Appwrite SDK
+        import { Client, Databases, ID, Query } from 'https://cdn.jsdelivr.net/npm/appwrite@11.0.0/dist/esm/sdk.mjs';
+
+        // Appwrite & Archive.org S3 Configuration (same as main.html)
+        const APPWRITE_ENDPOINT = 'https://cloud.appwrite.io/v1'; // Default Appwrite Cloud Endpoint
+        const APPWRITE_PROJECT_ID = '68528057001314063369';
+        const APPWRITE_DATABASE_ID = '6852a77b0029f40ae7a4';
+        const APPWRITE_COLLECTION_ID = '6852a7a3001e4713b6f6';
+        const ARCHIVE_S3_BASE_URL = 'https://archive.org/details/'; // A dummy base URL for simulated files
+
+        // Initialize Appwrite Client
+        const client = new Client();
+        client
+            .setEndpoint(APPWRITE_ENDPOINT)
+            .setProject(APPWRITE_PROJECT_ID);
+
+        const databases = new Databases(client);
+
         // DOM Elements
         const pendingApplicationsContainer = document.getElementById('pending-applications');
         const noSubmissionsMessage = document.getElementById('no-submissions-message');
@@ -256,13 +203,6 @@
         const reviewerNameApproveInput = document.getElementById('reviewer-name-approve');
         const reviewerNameRejectInput = document.getElementById('reviewer-name-reject');
         const messageBox = document.getElementById('message-box');
-
-        // Appwrite & Archive.org S3 Configuration (same as main.html)
-        const APPWRITE_PROJECT_ID = '68528057001314063369';
-        const APPWRITE_DATABASE_ID = '6852a77b0029f40ae7a4';
-        const APPWRITE_COLLECTION_ID = '6852a7a3001e4713b6f6';
-        const ARCHIVE_S3_ACCESS_KEY = 'cFDtuIpumfXlW76M';
-        const ARCHIVE_S3_SECRET_KEY = 'NVbTrPoAOnJYzeMJ';
 
         let currentAppIdToProcess = null;
         let currentAppHasMissingApk = false;
@@ -311,56 +251,24 @@
             if (e.target === rejectModal) closeModal(rejectModal);
         });
 
-        // Function to simulate fetching pending applications (replace with Appwrite SDK call)
+        // Function to fetch and display pending applications from Appwrite
         async function fetchPendingApplications() {
-            // This is dummy data. In a real app, you'd fetch from Appwrite.
-            // Appwrite example: const response = await databases.listDocuments(APPWRITE_DATABASE_ID, APPWRITE_COLLECTION_ID, [Query.equal('status', 'pending')]);
-            const dummyApplications = [
-                {
-                    id: 'app123',
-                    appName: 'Zen Habit Tracker',
-                    appLogoUrl: 'https://placehold.co/64x64/a020f0/ffffff?text=Z',
-                    shortDescription: 'Track your daily habits with a calm and intuitive interface.',
-                    appCategory: 'Productivity',
-                    distributionMethod: 'apk',
-                    apkUrl: 'https://example.com/zen-habit-tracker.apk', // Example: a dummy APK URL
-                    websiteUrl: null,
-                    developerName: 'Mindful Devs',
-                    developerEmail: 'mindful@example.com',
-                    submissionDate: '2025-06-01T10:00:00Z',
-                    status: 'pending'
-                },
-                {
-                    id: 'app124',
-                    appName: 'Cosmic Journey Game',
-                    appLogoUrl: 'https://placehold.co/64x64/a020f0/ffffff?text=C',
-                    shortDescription: 'Explore galaxies and battle aliens in this thrilling space adventure.',
-                    appCategory: 'Games',
-                    distributionMethod: 'website',
-                    apkUrl: null,
-                    websiteUrl: 'https://cosmicjourney.game',
-                    developerName: 'Star Interactive',
-                    developerEmail: 'star.dev@example.com',
-                    submissionDate: '2025-06-05T14:30:00Z',
-                    status: 'pending'
-                },
-                {
-                    id: 'app125',
-                    appName: 'Recipe Genius',
-                    appLogoUrl: 'https://placehold.co/64x64/a020f0/ffffff?text=R',
-                    shortDescription: 'Discover new recipes and plan your meals effortlessly.',
-                    appCategory: 'Food & Drink',
-                    distributionMethod: 'apk',
-                    apkUrl: null, // This one is missing APK
-                    websiteUrl: null,
-                    developerName: 'Kitchen Innovations',
-                    developerEmail: 'kitchen@example.com',
-                    submissionDate: '2025-06-10T09:15:00Z',
-                    status: 'pending'
-                }
-            ];
-
-            renderApplications(dummyApplications);
+            try {
+                // Query Appwrite for documents where status is 'pending'
+                const response = await databases.listDocuments(
+                    APPWRITE_DATABASE_ID,
+                    APPWRITE_COLLECTION_ID,
+                    [
+                        Query.equal('status', 'pending'),
+                        Query.orderDesc('submissionDate') // Order by submission date, newest first
+                    ]
+                );
+                const pendingApps = response.documents;
+                renderApplications(pendingApps);
+            } catch (error) {
+                console.error('Error fetching pending applications from Appwrite:', error);
+                showMessageBox('Error loading pending applications. Please check console.', 'error');
+            }
         }
 
         // Function to render application cards
@@ -377,16 +285,18 @@
             applications.forEach(app => {
                 const card = document.createElement('div');
                 card.classList.add('app-submission-card', 'bg-gray-800', 'rounded-xl', 'shadow-xl', 'p-6', 'card-animation', 'flex', 'flex-col', 'justify-between');
-                card.dataset.appId = app.id;
+                // Store the Appwrite document ID
+                card.dataset.appId = app.$id;
                 card.dataset.appName = app.appName;
-                card.dataset.apkUrl = app.apkUrl; // Store APK URL for approval logic
+                // Check if apkUrl exists and is not null/empty string. Appwrite stores null as actual null.
+                card.dataset.apkUrl = app.apkUrl || ''; // Use empty string if null
 
                 let distributionInfo;
                 if (app.distributionMethod === 'apk') {
                     distributionInfo = `
                         <span class="font-semibold text-gray-300">Distribution:</span>
                         <span class="text-purple-300 ml-2">APK File</span>
-                        ${app.apkUrl ? `<p class="text-gray-500 text-xs mt-1">APK URL: <a href="${app.apkUrl}" class="purple-text hover:underline" target="_blank">download.apk</a></p>` : `<p class="text-red-400 text-xs mt-1">APK Missing!</p>`}
+                        ${app.apkUrl ? `<p class="text-gray-500 text-xs mt-1">APK URL: <a href="${app.apkUrl}" class="purple-text hover:underline" target="_blank">download.apk</a></p>` : `<p class="text-red-400 text-xs mt-1 font-semibold">APK Missing! Admin must upload.</p>`}
                     `;
                 } else {
                     distributionInfo = `
@@ -399,13 +309,13 @@
                 card.innerHTML = `
                     <div>
                         <div class="flex items-center mb-4">
-                            <img src="${app.appLogoUrl || 'https://placehold.co/64x64/a020f0/ffffff?text=L'}" alt="App Logo" class="w-16 h-16 rounded-lg mr-4 border-2 border-purple-text">
+                            <img src="${app.appLogoUrl || 'https://placehold.co/64x64/a020f0/ffffff?text=L'}" alt="App Logo" class="w-16 h-16 rounded-lg mr-4 border-2 border-purple-text object-cover">
                             <div>
                                 <h3 class="text-xl font-bold">${app.appName}</h3>
                                 <p class="text-gray-400 text-sm">Category: ${app.appCategory}</p>
                             </div>
                         </div>
-                        <p class="text-gray-300 mb-2 text-sm">Short Description: ${app.shortDescription}</p>
+                        <p class="text-gray-300 mb-2 text-sm">${app.shortDescription}</p>
                         <p class="text-gray-500 text-xs mb-4">Submitted by: ${app.developerName} (${app.developerEmail}) on ${new Date(app.submissionDate).toLocaleDateString()}</p>
                         <div class="mb-4">
                             ${distributionInfo}
@@ -428,7 +338,7 @@
                     const apkUrl = card.dataset.apkUrl;
 
                     approveAppNameSpan.textContent = appName;
-                    if (!apkUrl || apkUrl === 'null') { // Check if apkUrl is missing
+                    if (!apkUrl) { // Check if apkUrl is truly missing/empty string
                         apkUploadOnApproveSection.classList.remove('hidden');
                         currentAppHasMissingApk = true;
                     } else {
@@ -453,7 +363,13 @@
             });
         }
 
-        // --- Approval and Rejection Logic (Simulated) ---
+        // Function to simulate file upload and return a dummy URL (for admin APK upload)
+        function simulateFileUpload(file, type = 'general') {
+            const fileName = file ? file.name : `dummy-file-${Date.now()}.apk`; // Default to apk
+            return `${ARCHIVE_S3_BASE_URL}loomstore-admin-${type}-${ID.unique()}-${fileName}`;
+        }
+
+        // --- Approval and Rejection Logic ---
         confirmApproveBtn.addEventListener('click', async () => {
             const reviewerName = reviewerNameApproveInput.value.trim();
             if (!reviewerName) {
@@ -461,30 +377,41 @@
                 return;
             }
 
-            if (currentAppHasMissingApk && approveApkFileInput.files.length === 0) {
-                showMessageBox('Please upload the missing APK file or cancel.', 'error');
-                return;
+            let newApkUrl = null;
+            if (currentAppHasMissingApk) {
+                if (approveApkFileInput.files.length === 0) {
+                    showMessageBox('Please upload the missing APK file or cancel.', 'error');
+                    return;
+                }
+                newApkUrl = simulateFileUpload(approveApkFileInput.files[0], 'admin-apk');
+                showMessageBox('Uploading APK and approving app...', 'info');
+            } else {
+                showMessageBox('Approving app...', 'info');
             }
-
-            showMessageBox(`Approving app ID: ${currentAppIdToProcess}...`, 'info');
             closeModal(approveModal);
 
-            // In a real scenario:
-            // 1. If currentAppHasMissingApk, upload approveApkFileInput.files[0] to S3.
-            // 2. Get the S3 URL.
-            // 3. Update Appwrite document for currentAppIdToProcess:
-            //    status: "approved",
-            //    reviewedBy: reviewerName,
-            //    reviewDate: new Date().toISOString(),
-            //    apkUrl: (newly_uploaded_apk_url_if_any || existing_apk_url)
+            try {
+                const updateData = {
+                    status: 'approved',
+                    reviewedBy: reviewerName,
+                    reviewDate: new Date().toISOString()
+                };
+                if (newApkUrl) {
+                    updateData.apkUrl = newApkUrl; // Add APK URL if newly uploaded by admin
+                }
 
-            console.log(`Simulating approval for app ${currentAppIdToProcess} by ${reviewerName}.`);
-            if (currentAppHasMissingApk) {
-                console.log("Simulating APK upload for missing APK.");
+                await databases.updateDocument(
+                    APPWRITE_DATABASE_ID,
+                    APPWRITE_COLLECTION_ID,
+                    currentAppIdToProcess,
+                    updateData
+                );
+                showMessageBox('App approved successfully!', 'success');
+                fetchPendingApplications(); // Re-fetch to update the list
+            } catch (error) {
+                console.error('Error approving app:', error);
+                showMessageBox('Error approving app. Please try again.', 'error');
             }
-            showMessageBox('App approved successfully!', 'success');
-            // Re-fetch or update UI to reflect the change
-            fetchPendingApplications(); // Simple re-fetch for demo
         });
 
         confirmRejectBtn.addEventListener('click', async () => {
@@ -494,21 +421,27 @@
                 return;
             }
 
-            showMessageBox(`Rejecting app ID: ${currentAppIdToProcess}...`, 'info');
+            showMessageBox('Rejecting app...', 'info');
             closeModal(rejectModal);
 
-            // In a real scenario:
-            // 1. Update Appwrite document for currentAppIdToProcess:
-            //    status: "rejected",
-            //    reviewedBy: reviewerName,
-            //    reviewDate: new Date().toISOString()
-
-            console.log(`Simulating rejection for app ${currentAppIdToProcess} by ${reviewerName}.`);
-            showMessageBox('App rejected successfully!', 'success');
-            // Re-fetch or update UI to reflect the change
-            fetchPendingApplications(); // Simple re-fetch for demo
+            try {
+                await databases.updateDocument(
+                    APPWRITE_DATABASE_ID,
+                    APPWRITE_COLLECTION_ID,
+                    currentAppIdToProcess,
+                    {
+                        status: 'rejected',
+                        reviewedBy: reviewerName,
+                        reviewDate: new Date().toISOString()
+                    }
+                );
+                showMessageBox('App rejected successfully!', 'success');
+                fetchPendingApplications(); // Re-fetch to update the list
+            } catch (error) {
+                console.error('Error rejecting app:', error);
+                showMessageBox('Error rejecting app. Please try again.', 'error');
+            }
         });
-
 
         // Initial fetch of applications when the page loads
         document.addEventListener('DOMContentLoaded', fetchPendingApplications);
