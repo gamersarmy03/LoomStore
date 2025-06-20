@@ -199,7 +199,6 @@
         <h2 class="text-4xl font-extrabold mb-8 text-center">Featured Apps</h2>
         <div id="app-listings" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             <!-- Dynamic App Cards will be inserted here by JavaScript -->
-            <!-- Placeholder App Cards removed as they will be fetched dynamically from Appwrite or added by JS -->
         </div>
         <p id="no-apps-message" class="text-center text-gray-400 mt-8 hidden">No approved apps found.</p>
     </main>
@@ -299,6 +298,8 @@
     <div id="message-box" class="message-box"></div>
 
     <script type="module">
+        console.log("main.html script loaded."); // Debug log
+
         // Import Appwrite SDK
         import { Client, Databases, ID, Query } from 'https://cdn.jsdelivr.net/npm/appwrite@11.0.0/dist/esm/sdk.mjs';
 
@@ -352,40 +353,53 @@
         }
 
         // --- Modal Functionality ---
-        developerButton.addEventListener('click', () => {
-            submissionModal.classList.remove('hidden');
-            document.body.classList.add('modal-open');
-            setTimeout(() => {
-                submissionModal.classList.add('opacity-100');
-                submissionModal.querySelector('.modal-content').classList.add('active');
-            }, 10);
-        });
+        if (developerButton) { // Check if element exists before adding listener
+            developerButton.addEventListener('click', () => {
+                console.log("Developer button clicked!"); // Debug log
+                submissionModal.classList.remove('hidden');
+                document.body.classList.add('modal-open');
+                setTimeout(() => {
+                    submissionModal.classList.add('opacity-100');
+                    submissionModal.querySelector('.modal-content').classList.add('active');
+                }, 10);
+            });
+        } else {
+            console.error("Developer button not found!");
+        }
 
-        closeModalButton.addEventListener('click', () => {
-            submissionModal.classList.remove('opacity-100');
-            submissionModal.querySelector('.modal-content').classList.remove('active');
-            document.body.classList.remove('modal-open');
-            setTimeout(() => {
-                submissionModal.classList.add('hidden');
-                submissionForm.reset();
-                // Re-initialize dynamic sections
-                apkUploadSection.classList.remove('hidden');
-                websiteUrlSection.classList.add('hidden');
-                appLogoInput.value = '';
-                appScreenshotsInput.value = '';
-                document.getElementById('apk-file').value = '';
-                logoError.classList.add('hidden');
-                screenshotsError.classList.add('hidden');
-                updateCharCounts();
-            }, 300);
-        });
+
+        if (closeModalButton) { // Check if element exists
+            closeModalButton.addEventListener('click', () => {
+                console.log("Close modal button clicked!"); // Debug log
+                submissionModal.classList.remove('opacity-100');
+                submissionModal.querySelector('.modal-content').classList.remove('active');
+                document.body.classList.remove('modal-open');
+                setTimeout(() => {
+                    submissionModal.classList.add('hidden');
+                    submissionForm.reset();
+                    // Re-initialize dynamic sections
+                    apkUploadSection.classList.remove('hidden');
+                    websiteUrlSection.classList.add('hidden');
+                    appLogoInput.value = '';
+                    appScreenshotsInput.value = '';
+                    document.getElementById('apk-file').value = '';
+                    logoError.classList.add('hidden');
+                    screenshotsError.classList.add('hidden');
+                    updateCharCounts();
+                }, 300);
+            });
+        }
+
 
         // Close modal when clicking outside (on overlay)
-        submissionModal.addEventListener('click', (e) => {
-            if (e.target === submissionModal) {
-                closeModalButton.click();
-            }
-        });
+        if (submissionModal) { // Check if element exists
+            submissionModal.addEventListener('click', (e) => {
+                if (e.target === submissionModal) {
+                    closeModalButton.click();
+                }
+            });
+        }
+
 
         // --- Distribution Method Toggle ---
         function toggleDistributionMethod() {
@@ -403,19 +417,20 @@
                 document.getElementById('website-url').setAttribute('required', 'true');
             }
         }
+        if (distApkRadio && distWebsiteRadio) { // Check if elements exist
+            distApkRadio.addEventListener('change', toggleDistributionMethod);
+            distWebsiteRadio.addEventListener('change', toggleDistributionMethod);
+            toggleDistributionMethod(); // Initialize on load
+        }
 
-        distApkRadio.addEventListener('change', toggleDistributionMethod);
-        distWebsiteRadio.addEventListener('change', toggleDistributionMethod);
-        toggleDistributionMethod(); // Initialize on load
 
         // --- Character Count for Descriptions ---
         function updateCharCounts() {
-            shortDescCharCount.textContent = shortDescriptionInput.value.length;
-            longDescCharCount.textContent = longDescriptionInput.value.length;
+            if (shortDescriptionInput) shortDescCharCount.textContent = shortDescriptionInput.value.length;
+            if (longDescriptionInput) longDescCharCount.textContent = longDescriptionInput.value.length;
         }
-
-        shortDescriptionInput.addEventListener('input', updateCharCounts);
-        longDescriptionInput.addEventListener('input', updateCharCounts);
+        if (shortDescriptionInput) shortDescriptionInput.addEventListener('input', updateCharCounts);
+        if (longDescriptionInput) longDescriptionInput.addEventListener('input', updateCharCounts);
         updateCharCounts(); // Initialize counts on load
 
         // --- File Input Validation (Aspect Ratio for Logo/Screenshots) ---
@@ -487,145 +502,155 @@
             });
         }
 
-        appLogoInput.addEventListener('change', async () => {
-            const file = appLogoInput.files[0];
-            if (file) {
-                const isValid = await checkImageDimensions(file, '1:1');
-                if (!isValid) {
-                    logoError.textContent = 'Please upload a square image (e.g., 1:1 aspect ratio).';
-                    logoError.classList.remove('hidden');
-                    appLogoInput.value = '';
+        if (appLogoInput) {
+            appLogoInput.addEventListener('change', async () => {
+                const file = appLogoInput.files[0];
+                if (file) {
+                    const isValid = await checkImageDimensions(file, '1:1');
+                    if (!isValid) {
+                        logoError.textContent = 'Please upload a square image (e.g., 1:1 aspect ratio).';
+                        logoError.classList.remove('hidden');
+                        appLogoInput.value = '';
+                    } else {
+                        logoError.classList.add('hidden');
+                    }
                 } else {
                     logoError.classList.add('hidden');
                 }
-            } else {
-                logoError.classList.add('hidden');
-            }
-        });
+            });
+        }
 
-        appScreenshotsInput.addEventListener('change', async () => {
-            const files = Array.from(appScreenshotsInput.files);
-            if (files.length > 0) {
-                if (files.length < 2) {
-                    screenshotsError.textContent = 'Please upload at least 2 images.';
-                    screenshotsError.classList.remove('hidden');
-                    appScreenshotsInput.value = '';
-                    return;
-                }
-                const isValid = await checkImageDimensions(files, '16:9_or_9:16', 2);
-                if (!isValid) {
-                    screenshotsError.textContent = 'Please upload at least 2 images with 16:9 or 9:16 aspect ratio.';
-                    screenshotsError.classList.remove('hidden');
-                    appScreenshotsInput.value = '';
+
+        if (appScreenshotsInput) {
+            appScreenshotsInput.addEventListener('change', async () => {
+                const files = Array.from(appScreenshotsInput.files);
+                if (files.length > 0) {
+                    if (files.length < 2) {
+                        screenshotsError.textContent = 'Please upload at least 2 images.';
+                        screenshotsError.classList.remove('hidden');
+                        appScreenshotsInput.value = '';
+                        return;
+                    }
+                    const isValid = await checkImageDimensions(files, '16:9_or_9:16', 2);
+                    if (!isValid) {
+                        screenshotsError.textContent = 'Please upload at least 2 images with 16:9 or 9:16 aspect ratio.';
+                        screenshotsError.classList.remove('hidden');
+                        appScreenshotsInput.value = '';
+                    } else {
+                        screenshotsError.classList.add('hidden');
+                    }
                 } else {
                     screenshotsError.classList.add('hidden');
                 }
-            } else {
-                screenshotsError.classList.add('hidden');
-            }
-        });
+            });
+        }
+
 
         // Function to simulate file upload and return a dummy URL
         function simulateFileUpload(file, type = 'general') {
             const fileName = file ? file.name : `dummy-file-${Date.now()}.png`;
-            // In a real scenario, you'd upload to Archive.org S3 here and get the actual URL.
-            // For now, we generate a unique placeholder URL.
             return `${ARCHIVE_S3_BASE_URL}loomstore-${type}-${ID.unique()}-${fileName}`;
         }
 
         // --- Form Submission Logic ---
-        submissionForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        if (submissionForm) {
+            submissionForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                console.log("Submission form submitted!"); // Debug log
 
-            let isValid = true;
-            const requiredFields = submissionForm.querySelectorAll('[required]');
-            requiredFields.forEach(field => {
-                if (!field.value) {
+                let isValid = true;
+                const requiredFields = submissionForm.querySelectorAll('[required]');
+                requiredFields.forEach(field => {
+                    if (!field.value) {
+                        isValid = false;
+                        field.classList.add('border-red-500');
+                    } else {
+                        field.classList.remove('border-red-500');
+                    }
+                });
+
+                const isLogoValid = await checkImageDimensions(appLogoInput.files[0], '1:1');
+                if (!isLogoValid) {
                     isValid = false;
-                    field.classList.add('border-red-500');
+                    logoError.textContent = 'Please upload a square image (e.g., 1:1 aspect ratio).';
+                    logoError.classList.remove('hidden');
                 } else {
-                    field.classList.remove('border-red-500');
+                    logoError.classList.add('hidden');
+                }
+
+                const isScreenshotsValid = await checkImageDimensions(Array.from(appScreenshotsInput.files), '16:9_or_9:16', 2);
+                if (!isScreenshotsValid) {
+                    isValid = false;
+                    screenshotsError.textContent = 'Please upload at least 2 images with 16:9 or 9:16 aspect ratio.';
+                    screenshotsError.classList.remove('hidden');
+                } else {
+                    screenshotsError.classList.add('hidden');
+                }
+
+                if (!isValid) {
+                    showMessageBox('Please fill in all required fields and correct image errors.', 'error');
+                    return;
+                }
+
+                // Simulate file uploads and get dummy URLs
+                const appLogoUrl = appLogoInput.files[0] ? simulateFileUpload(appLogoInput.files[0], 'logo') : '';
+                const appImageUrls = appScreenshotsInput.files.length > 0 ? Array.from(appScreenshotsInput.files).map(file => simulateFileUpload(file, 'screenshot')) : [];
+                let apkUrl = null;
+                if (document.querySelector('input[name="distribution-method"]:checked').value === 'apk' && document.getElementById('apk-file').files[0]) {
+                    apkUrl = simulateFileUpload(document.getElementById('apk-file').files[0], 'apk');
+                }
+
+                const submissionData = {
+                    appName: document.getElementById('app-name').value,
+                    shortDescription: shortDescriptionInput.value,
+                    longDescription: longDescriptionInput.value,
+                    appCategory: document.getElementById('app-category').value,
+                    distributionMethod: document.querySelector('input[name="distribution-method"]:checked').value,
+                    websiteUrl: document.getElementById('website-url').value || null,
+                    apkUrl: apkUrl,
+                    developerName: document.getElementById('developer-name').value,
+                    developerEmail: document.getElementById('developer-email').value,
+                    submissionDate: new Date().toISOString(),
+                    status: 'pending', // Always pending upon submission
+                    appLogoUrl: appLogoUrl,
+                    appImageUrls: appImageUrls,
+                };
+
+                try {
+                    const response = await databases.createDocument(
+                        APPWRITE_DATABASE_ID,
+                        APPWRITE_COLLECTION_ID,
+                        ID.unique(),
+                        submissionData
+                    );
+                    console.log('App submitted successfully to Appwrite:', response);
+                    showMessageBox('App submitted successfully! We will review it shortly.', 'success');
+                    closeModalButton.click();
+                    fetchAndDisplayApprovedApps(); // Refresh approved apps list on main page
+                } catch (error) {
+                    console.error('Error submitting app to Appwrite:', error);
+                    showMessageBox('Error submitting app. Please try again.', 'error');
                 }
             });
+        }
 
-            const isLogoValid = await checkImageDimensions(appLogoInput.files[0], '1:1');
-            if (!isLogoValid) {
-                isValid = false;
-                logoError.textContent = 'Please upload a square image (e.g., 1:1 aspect ratio).';
-                logoError.classList.remove('hidden');
-            } else {
-                logoError.classList.add('hidden');
-            }
-
-            const isScreenshotsValid = await checkImageDimensions(Array.from(appScreenshotsInput.files), '16:9_or_9:16', 2);
-            if (!isScreenshotsValid) {
-                isValid = false;
-                screenshotsError.textContent = 'Please upload at least 2 images with 16:9 or 9:16 aspect ratio.';
-                screenshotsError.classList.remove('hidden');
-            } else {
-                screenshotsError.classList.add('hidden');
-            }
-
-            if (!isValid) {
-                showMessageBox('Please fill in all required fields and correct image errors.', 'error');
-                return;
-            }
-
-            // Simulate file uploads and get dummy URLs
-            const appLogoUrl = appLogoInput.files[0] ? simulateFileUpload(appLogoInput.files[0], 'logo') : '';
-            const appImageUrls = appScreenshotsInput.files.length > 0 ? Array.from(appScreenshotsInput.files).map(file => simulateFileUpload(file, 'screenshot')) : [];
-            let apkUrl = null;
-            if (document.querySelector('input[name="distribution-method"]:checked').value === 'apk' && document.getElementById('apk-file').files[0]) {
-                apkUrl = simulateFileUpload(document.getElementById('apk-file').files[0], 'apk');
-            }
-
-            const submissionData = {
-                appName: document.getElementById('app-name').value,
-                shortDescription: shortDescriptionInput.value,
-                longDescription: longDescriptionInput.value,
-                appCategory: document.getElementById('app-category').value,
-                distributionMethod: document.querySelector('input[name="distribution-method"]:checked').value,
-                websiteUrl: document.getElementById('website-url').value || null,
-                apkUrl: apkUrl,
-                developerName: document.getElementById('developer-name').value,
-                developerEmail: document.getElementById('developer-email').value,
-                submissionDate: new Date().toISOString(),
-                status: 'pending', // Always pending upon submission
-                appLogoUrl: appLogoUrl,
-                appImageUrls: appImageUrls,
-            };
-
-            try {
-                // Save data to Appwrite
-                const response = await databases.createDocument(
-                    APPWRITE_DATABASE_ID,
-                    APPWRITE_COLLECTION_ID,
-                    ID.unique(), // Let Appwrite generate a unique ID
-                    submissionData
-                );
-                console.log('App submitted successfully to Appwrite:', response);
-                showMessageBox('App submitted successfully! We will review it shortly.', 'success');
-                closeModalButton.click(); // Close modal on success
-            } catch (error) {
-                console.error('Error submitting app to Appwrite:', error);
-                showMessageBox('Error submitting app. Please try again.', 'error');
-            }
-        });
 
         // --- App Listing and Search Functionality (for approved apps) ---
 
         // Function to fetch and display approved applications
         async function fetchAndDisplayApprovedApps() {
+            console.log("Fetching approved apps..."); // Debug log
             try {
                 const response = await databases.listDocuments(
                     APPWRITE_DATABASE_ID,
                     APPWRITE_COLLECTION_ID,
                     [
                         Query.equal('status', 'approved'),
-                        Query.orderDesc('submissionDate') // Order by submission date, newest first
+                        Query.orderDesc('submissionDate')
                     ]
                 );
                 const approvedApps = response.documents;
+                console.log("Approved apps fetched:", approvedApps); // Debug log
                 renderApprovedApps(approvedApps);
             } catch (error) {
                 console.error('Error fetching approved apps:', error);
@@ -635,9 +660,10 @@
 
         // Function to render approved app cards
         function renderApprovedApps(apps) {
-            appListingsContainer.innerHTML = ''; // Clear existing cards
+            appListingsContainer.innerHTML = '';
 
             if (apps.length === 0) {
+                noAppsMessage.textContent = 'No approved apps found.';
                 noAppsMessage.classList.remove('hidden');
                 return;
             } else {
@@ -647,11 +673,11 @@
             apps.forEach(app => {
                 const card = document.createElement('div');
                 card.classList.add('app-card', 'bg-gray-800', 'rounded-xl', 'shadow-xl', 'p-6', 'flex', 'flex-col', 'items-center', 'text-center', 'card-animation');
-                card.dataset.appName = app.appName.toLowerCase(); // For search
-                card.dataset.appCategory = app.appCategory.toLowerCase(); // For search
+                card.dataset.appName = app.appName.toLowerCase();
+                card.dataset.appCategory = app.appCategory.toLowerCase();
 
                 let downloadLink = '#';
-                let downloadText = 'Details'; // Default text if no direct download
+                let downloadText = 'Details';
                 if (app.distributionMethod === 'apk' && app.apkUrl) {
                     downloadLink = app.apkUrl;
                     downloadText = 'Download APK';
@@ -674,33 +700,38 @@
         }
 
         // Search Bar Functionality
-        searchBar.addEventListener('input', () => {
-            const searchTerm = searchBar.value.toLowerCase();
-            const cards = document.querySelectorAll('.app-card');
-            let visibleCount = 0;
+        if (searchBar) {
+            searchBar.addEventListener('input', () => {
+                const searchTerm = searchBar.value.toLowerCase();
+                const cards = document.querySelectorAll('.app-card');
+                let visibleCount = 0;
 
-            cards.forEach(card => {
-                const appName = card.dataset.appName;
-                const appCategory = card.dataset.appCategory;
+                cards.forEach(card => {
+                    const appName = card.dataset.appName;
+                    const appCategory = card.dataset.appCategory;
 
-                if (appName.includes(searchTerm) || appCategory.includes(searchTerm)) {
-                    card.style.display = 'flex';
-                    visibleCount++;
-                } else {
-                    card.style.display = 'none';
+                    if (appName && appCategory && (appName.includes(searchTerm) || appCategory.includes(searchTerm))) {
+                        card.style.display = 'flex';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                if (noAppsMessage) {
+                    if (visibleCount === 0 && searchTerm !== '') {
+                        noAppsMessage.textContent = 'No matching apps found.';
+                        noAppsMessage.classList.remove('hidden');
+                    } else if (visibleCount === 0) {
+                        noAppsMessage.textContent = 'No approved apps found.'; // Fallback if no apps exist
+                        noAppsMessage.classList.remove('hidden');
+                    } else {
+                        noAppsMessage.classList.add('hidden');
+                    }
                 }
             });
+        }
 
-            if (visibleCount === 0 && searchTerm !== '') {
-                noAppsMessage.textContent = 'No matching apps found.';
-                noAppsMessage.classList.remove('hidden');
-            } else if (visibleCount === 0) { // No apps at all
-                 noAppsMessage.textContent = 'No approved apps found.';
-                 noAppsMessage.classList.remove('hidden');
-            } else {
-                noAppsMessage.classList.add('hidden');
-            }
-        });
 
         // Initial fetch of approved applications when the page loads
         document.addEventListener('DOMContentLoaded', fetchAndDisplayApprovedApps);
