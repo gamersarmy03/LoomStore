@@ -12,7 +12,6 @@
             font-family: 'Inter', sans-serif;
             background-color: #000000; /* Dark black primary theme */
             color: #ffffff;
-            /* overflow-x: hidden; Removed from here, will be toggled by JS */
         }
         body.modal-open {
             overflow: hidden; /* Hide scrollbar when modal is open */
@@ -59,6 +58,8 @@
             transform: scale(0.95);
             opacity: 0;
             transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            max-height: 90vh; /* Limit modal height */
+            overflow-y: auto; /* Enable scrolling for modal content */
         }
         .modal-content.active {
             transform: scale(1);
@@ -141,13 +142,39 @@
         .message-box.error {
             background-color: #dc2626; /* Red */
         }
+
+        /* Search input styling */
+        .search-input-group {
+            position: relative;
+            width: 100%;
+            max-width: 500px; /* Limit width for aesthetics */
+            margin: 0 auto; /* Center the search bar */
+        }
+        .search-input-group input {
+            padding-left: 3rem; /* Space for icon */
+        }
+        .search-input-group .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a020f0;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
     <!-- Header -->
     <header class="bg-gray-900 p-4 shadow-lg sticky top-0 z-10">
-        <div class="container mx-auto flex justify-between items-center">
+        <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
             <h1 class="text-3xl font-bold purple-text">LoomStore</h1>
+            <div class="search-input-group">
+                <input type="text" id="search-bar" placeholder="Search apps..." class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:ring focus:ring-purple-text focus:border-purple-text text-white">
+                <span class="search-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </span>
+            </div>
             <button id="developer-button" class="purple-gradient-button text-white px-6 py-2 rounded-lg font-semibold shadow-lg">
                 Developer
             </button>
@@ -173,7 +200,7 @@
         <div id="app-listings" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             <!-- Dynamic App Cards will be inserted here -->
             <!-- Placeholder App Cards for initial view -->
-            <div class="bg-gray-800 rounded-xl shadow-xl p-6 flex flex-col items-center text-center card-animation">
+            <div class="app-card bg-gray-800 rounded-xl shadow-xl p-6 flex flex-col items-center text-center card-animation" data-app-name="Cool App Name" data-app-category="Productivity">
                 <img src="https://placehold.co/128x128/a020f0/ffffff?text=App" alt="App Logo" class="w-32 h-32 rounded-full mb-4 border-4 border-purple-text">
                 <h3 class="text-xl font-bold mb-2">Cool App Name</h3>
                 <p class="text-gray-400 text-sm mb-4">A short description about this awesome app.</p>
@@ -182,7 +209,7 @@
                     <span class="download-icon inline-block ml-2">&#x2193;</span> <!-- Unicode Down Arrow -->
                 </button>
             </div>
-            <div class="bg-gray-800 rounded-xl shadow-xl p-6 flex flex-col items-center text-center card-animation">
+            <div class="app-card bg-gray-800 rounded-xl shadow-xl p-6 flex flex-col items-center text-center card-animation" data-app-name="Exciting Game Title" data-app-category="Games">
                 <img src="https://placehold.co/128x128/a020f0/ffffff?text=Game" alt="App Logo" class="w-32 h-32 rounded-full mb-4 border-4 border-purple-text">
                 <h3 class="text-xl font-bold mb-2">Exciting Game Title</h3>
                 <p class="text-gray-400 text-sm mb-4">Jump, run, and explore in this thrilling adventure!</p>
@@ -191,7 +218,7 @@
                     <span class="download-icon inline-block ml-2">&#x2193;</span>
                 </button>
             </div>
-            <div class="bg-gray-800 rounded-xl shadow-xl p-6 flex flex-col items-center text-center card-animation">
+            <div class="app-card bg-gray-800 rounded-xl shadow-xl p-6 flex flex-col items-center text-center card-animation" data-app-name="Productivity Tool" data-app-category="Productivity">
                 <img src="https://placehold.co/128x128/a020f0/ffffff?text=Utility" alt="App Logo" class="w-32 h-32 rounded-full mb-4 border-4 border-purple-text">
                 <h3 class="text-xl font-bold mb-2">Productivity Tool</h3>
                 <p class="text-gray-400 text-sm mb-4">Boost your efficiency with this handy utility app.</p>
@@ -200,10 +227,28 @@
                     <span class="download-icon inline-block ml-2">&#x2193;</span>
                 </button>
             </div>
-            <div class="bg-gray-800 rounded-xl shadow-xl p-6 flex flex-col items-center text-center card-animation">
+            <div class="app-card bg-gray-800 rounded-xl shadow-xl p-6 flex flex-col items-center text-center card-animation" data-app-name="Social Connect" data-app-category="Social">
                 <img src="https://placehold.co/128x128/a020f0/ffffff?text=Social" alt="App Logo" class="w-32 h-32 rounded-full mb-4 border-4 border-purple-text">
                 <h3 class="text-xl font-bold mb-2">Social Connect</h3>
                 <p class="text-gray-400 text-sm mb-4">Connect with friends and family effortlessly.</p>
+                <button class="purple-gradient-button text-white px-4 py-2 rounded-lg font-semibold app-card-download">
+                    Download
+                    <span class="download-icon inline-block ml-2">&#x2193;</span>
+                </button>
+            </div>
+            <div class="app-card bg-gray-800 rounded-xl shadow-xl p-6 flex flex-col items-center text-center card-animation" data-app-name="Learning Hub" data-app-category="Education">
+                <img src="https://placehold.co/128x128/a020f0/ffffff?text=Edu" alt="App Logo" class="w-32 h-32 rounded-full mb-4 border-4 border-purple-text">
+                <h3 class="text-xl font-bold mb-2">Learning Hub</h3>
+                <p class="text-gray-400 text-sm mb-4">Expand your knowledge with interactive courses.</p>
+                <button class="purple-gradient-button text-white px-4 py-2 rounded-lg font-semibold app-card-download">
+                    Download
+                    <span class="download-icon inline-block ml-2">&#x2193;</span>
+                </button>
+            </div>
+            <div class="app-card bg-gray-800 rounded-xl shadow-xl p-6 flex flex-col items-center text-center card-animation" data-app-name="Fitness Tracker" data-app-category="Health & Fitness">
+                <img src="https://placehold.co/128x128/a020f0/ffffff?text=Fit" alt="App Logo" class="w-32 h-32 rounded-full mb-4 border-4 border-purple-text">
+                <h3 class="text-xl font-bold mb-2">Fitness Tracker</h3>
+                <p class="text-gray-400 text-sm mb-4">Monitor your health and achieve your goals.</p>
                 <button class="purple-gradient-button text-white px-4 py-2 rounded-lg font-semibold app-card-download">
                     Download
                     <span class="download-icon inline-block ml-2">&#x2193;</span>
@@ -325,6 +370,8 @@
         const logoError = document.getElementById('logo-error');
         const screenshotsError = document.getElementById('screenshots-error');
         const messageBox = document.getElementById('message-box');
+        const searchBar = document.getElementById('search-bar');
+        const appCards = document.querySelectorAll('.app-card'); // Select all app cards
 
         // Appwrite & Archive.org S3 Configuration (for future implementation)
         const APPWRITE_PROJECT_ID = '68528057001314063369';
@@ -634,6 +681,22 @@
             screenshotsError.classList.add('hidden');
             updateCharCounts();
             // closeModalButton.click(); // Auto-close modal
+        });
+
+        // --- Search Bar Functionality ---
+        searchBar.addEventListener('input', () => {
+            const searchTerm = searchBar.value.toLowerCase();
+
+            appCards.forEach(card => {
+                const appName = card.dataset.appName.toLowerCase();
+                const appCategory = card.dataset.appCategory.toLowerCase();
+
+                if (appName.includes(searchTerm) || appCategory.includes(searchTerm)) {
+                    card.style.display = 'flex'; // Show the card
+                } else {
+                    card.style.display = 'none'; // Hide the card
+                }
+            });
         });
     </script>
 </body>
