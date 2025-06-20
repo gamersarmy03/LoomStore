@@ -3,77 +3,293 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LoomStore - The Future of Apps</title>
+    <title>LoomStore - Discover Your Next App</title>
+    <!-- Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-</head>
-<body class="bg-black text-white font-sans">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000; /* Primary dark black theme */
+            color: #ffffff; /* White text for contrast */
+        }
+        /* Custom scrollbar for a sleek look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            background-color: #1a1a1a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #a020f0; /* Vibrant purple secondary color */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #8a1be6;
+        }
 
-    <!-- Header -->
-    <header class="sticky top-0 z-50 bg-black bg-opacity-80 backdrop-blur-md border-b border-purple-900/50 shadow-lg">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="main.html" class="text-2xl font-bold text-white">
-                <i class="fas fa-layer-group text-purple-500"></i> Loom<span class="text-purple-500">Store</span>
-            </a>
-            <div class="flex items-center space-x-4">
-                <a href="developer.html" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-transform transform hover:scale-105">
-                    Developer
-                </a>
-                 <a href="console.html" class="text-gray-400 hover:text-white transition-colors">
-                    <i class="fas fa-shield-halved"></i> Admin
-                </a>
-            </div>
-        </nav>
+        /* Basic animations for hover effects */
+        .card-hover-effect {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card-hover-effect:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(160, 32, 240, 0.4); /* Purple shadow on hover */
+        }
+        .btn-hover-effect {
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        .btn-hover-effect:hover {
+            background-color: #8a1be6; /* Darker purple on hover */
+            transform: translateY(-1px);
+        }
+        /* Modal overlay styling */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header Section -->
+    <header class="bg-black text-white p-4 shadow-lg sticky top-0 z-10">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-3xl font-bold text-white tracking-wider">LoomStore</h1>
+            <button id="developerBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded-full shadow-lg btn-hover-effect">
+                Developer
+            </button>
+        </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="container mx-auto px-6 py-8">
-        
-        <!-- Hero Section -->
-        <section class="text-center my-12">
-            <h1 class="text-5xl md:text-6xl font-extrabold mb-4 leading-tight">Discover Your Next Favorite App</h1>
-            <p class="text-lg text-gray-400 max-w-2xl mx-auto">Browse our curated collection of innovative and powerful applications, approved for quality and security.</p>
+    <!-- Main Content Area -->
+    <main class="flex-grow container mx-auto p-4 md:p-8">
+        <!-- Search Bar Section -->
+        <section class="mb-8">
+            <div class="relative">
+                <input type="text" id="appSearch" placeholder="Search for apps..."
+                       class="w-full bg-gray-800 text-white p-4 pl-12 rounded-full border border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-600 shadow-md">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg class="h-6 w-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+            </div>
         </section>
 
-        <!-- Search Bar -->
-        <div class="mb-12">
-            <div class="relative max-w-3xl mx-auto">
-                <input type="text" id="searchInput" placeholder="Search for apps by name or category..." class="w-full bg-gray-900/50 border-2 border-gray-700 focus:border-purple-500 rounded-lg py-3 px-5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300">
-                <i class="fas fa-search absolute right-5 top-1/2 -translate-y-1/2 text-gray-500"></i>
+        <!-- App Categories/Filters (Placeholder) -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-purple-300">Categories</h2>
+            <div class="flex flex-wrap gap-3">
+                <button class="bg-gray-800 text-purple-300 px-4 py-2 rounded-full border border-purple-500 hover:bg-purple-900 btn-hover-effect">Games</button>
+                <button class="bg-gray-800 text-purple-300 px-4 py-2 rounded-full border border-purple-500 hover:bg-purple-900 btn-hover-effect">Productivity</button>
+                <button class="bg-gray-800 text-purple-300 px-4 py-2 rounded-full border border-purple-500 hover:bg-purple-900 btn-hover-effect">Social</button>
+                <button class="bg-gray-800 text-purple-300 px-4 py-2 rounded-full border border-purple-500 hover:bg-purple-900 btn-hover-effect">Utilities</button>
+                <button class="bg-gray-800 text-purple-300 px-4 py-2 rounded-full border border-purple-500 hover:bg-purple-900 btn-hover-effect">Education</button>
             </div>
-        </div>
-
-        <!-- App Grid -->
-        <section id="app-grid-container">
-            <div id="loader" class="text-center py-12">
-                <i class="fas fa-spinner fa-spin text-purple-500 text-4xl"></i>
-                <p class="mt-4 text-gray-400">Loading awesome apps...</p>
-            </div>
-            <div id="app-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                <!-- App cards will be injected here by JavaScript -->
-            </div>
-            <p id="no-apps-message" class="hidden text-center text-gray-500 py-12">No approved apps found. Check back later!</p>
-            <p id="no-search-results" class="hidden text-center text-gray-500 py-12">No apps match your search.</p>
         </section>
 
+        <!-- Featured Apps Section -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-6 text-purple-300">Featured Apps</h2>
+            <div id="featuredAppsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Placeholder for Featured App Cards - These will be populated by JavaScript -->
+                <div class="bg-gray-800 p-6 rounded-2xl shadow-xl border border-purple-700 card-hover-effect">
+                    <img src="https://placehold.co/100x100/A020F0/FFFFFF?text=App" alt="App Logo" class="w-24 h-24 rounded-2xl mx-auto mb-4 border-2 border-purple-500">
+                    <h3 class="text-xl font-bold mb-2 text-center text-purple-300">Example App 1</h3>
+                    <p class="text-sm text-gray-400 mb-4 text-center">A short description of Example App 1.</p>
+                    <button class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-xl shadow-lg btn-hover-effect">Download</button>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-2xl shadow-xl border border-purple-700 card-hover-effect">
+                    <img src="https://placehold.co/100x100/A020F0/FFFFFF?text=Game" alt="App Logo" class="w-24 h-24 rounded-2xl mx-auto mb-4 border-2 border-purple-500">
+                    <h3 class="text-xl font-bold mb-2 text-center text-purple-300">Awesome Game</h3>
+                    <p class="text-sm text-gray-400 mb-4 text-center">Get ready for an epic adventure!</p>
+                    <button class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-xl shadow-lg btn-hover-effect">Download</button>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-2xl shadow-xl border border-purple-700 card-hover-effect">
+                    <img src="https://placehold.co/100x100/A020F0/FFFFFF?text=Prod" alt="App Logo" class="w-24 h-24 rounded-2xl mx-auto mb-4 border-2 border-purple-500">
+                    <h3 class="text-xl font-bold mb-2 text-center text-purple-300">Productivity Pro</h3>
+                    <p class="text-sm text-gray-400 mb-4 text-center">Boost your daily efficiency.</p>
+                    <button class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-xl shadow-lg btn-hover-effect">Download</button>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-2xl shadow-xl border border-purple-700 card-hover-effect">
+                    <img src="https://placehold.co/100x100/A020F0/FFFFFF?text=Edu" alt="App Logo" class="w-24 h-24 rounded-2xl mx-auto mb-4 border-2 border-purple-500">
+                    <h3 class="text-xl font-bold mb-2 text-center text-purple-300">LearnSmart</h3>
+                    <p class="text-sm text-gray-400 mb-4 text-center">Interactive learning made easy.</p>
+                    <button class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-xl shadow-lg btn-hover-effect">Download</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- All Apps Section (Will be populated by Appwrite data) -->
+        <section>
+            <h2 class="text-2xl font-semibold mb-6 text-purple-300">All Apps</h2>
+            <div id="allAppsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Apps will be dynamically loaded here from Appwrite -->
+                <div class="bg-gray-800 p-6 rounded-2xl shadow-xl border border-purple-700 flex flex-col items-center justify-center text-center py-10">
+                    <p class="text-gray-400 mb-2">Loading apps...</p>
+                    <svg class="animate-spin h-8 w-8 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <!-- App Modal -->
-    <div id="app-modal" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div id="modal-content" class="bg-gray-900 rounded-2xl shadow-2xl shadow-purple-900/20 max-w-4xl w-full max-h-[90vh] overflow-y-auto relative border border-gray-700">
-             <!-- Content will be injected by JavaScript -->
+    <!-- Footer Section -->
+    <footer class="bg-black text-gray-400 p-4 text-center border-t border-purple-900">
+        <p>&copy; 2025 LoomStore. All rights reserved.</p>
+    </footer>
+
+    <!-- Developer Submission Modal (Initially hidden) -->
+    <div id="developerModal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 hidden modal-overlay">
+        <div class="bg-gray-900 rounded-2xl shadow-2xl p-8 w-full max-w-2xl transform transition-all scale-95 opacity-0 duration-300" id="modalContent">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-purple-400">Developer Submission</h2>
+                <button id="closeModalBtn" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+            </div>
+            <!-- The developer.html content will be loaded here -->
+            <iframe id="developerIframe" src="./developer.html" class="w-full h-[70vh] rounded-lg border border-gray-700" frameborder="0"></iframe>
         </div>
     </div>
 
+    <script type="module">
+        // Import Appwrite SDK components
+        import { Client, Databases, Query } from 'https://sdk.cloud.appwrite.io/docs/client.js';
 
-    <!-- Footer -->
-    <footer class="bg-gray-900/50 mt-16 py-6 border-t border-gray-800">
-        <div class="container mx-auto text-center text-gray-500">
-            <p>© 2024 LoomStore. All Rights Reserved.</p>
-        </div>
-    </footer>
+        // Appwrite Configuration (Replace with your actual values if different)
+        const APPWRITE_PROJECT_ID = '68528057001314063369';
+        const APPWRITE_DATABASE_ID = '6852a77b0029f40ae7a4';
+        const APPWRITE_COLLECTION_ID = '6852a7a3001e4713b6f6';
 
-    <script type="module" src="js/main.js"></script>
+        // Initialize Appwrite Client
+        const client = new Client()
+            .setEndpoint('https://cloud.appwrite.io/v1') // Your Appwrite Endpoint
+            .setProject(APPWRITE_PROJECT_ID);
+
+        const databases = new Databases(client);
+
+        // Get DOM elements
+        const developerBtn = document.getElementById('developerBtn');
+        const developerModal = document.getElementById('developerModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalContent = document.getElementById('modalContent');
+        const allAppsContainer = document.getElementById('allAppsContainer');
+        const appSearchInput = document.getElementById('appSearch');
+
+        let allApps = []; // Store all approved apps
+
+        // Function to fetch approved applications from Appwrite
+        async function fetchApprovedApps() {
+            try {
+                // Clear existing apps and show loading indicator
+                allAppsContainer.innerHTML = `
+                    <div class="bg-gray-800 p-6 rounded-2xl shadow-xl border border-purple-700 flex flex-col items-center justify-center text-center py-10 col-span-full">
+                        <p class="text-gray-400 mb-2">Loading apps...</p>
+                        <svg class="animate-spin h-8 w-8 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>
+                `;
+                const response = await databases.listDocuments(
+                    APPWRITE_DATABASE_ID,
+                    APPWRITE_COLLECTION_ID,
+                    [
+                        Query.equal('status', 'approved') // Only fetch approved apps
+                    ]
+                );
+                allApps = response.documents;
+                displayApps(allApps); // Display all fetched approved apps
+            } catch (error) {
+                console.error("Error fetching approved apps:", error);
+                allAppsContainer.innerHTML = `
+                    <div class="col-span-full text-center p-8 bg-red-900 bg-opacity-30 rounded-lg border border-red-700">
+                        <p class="text-red-300 font-bold mb-2">Error loading applications.</p>
+                        <p class="text-red-400 text-sm">Please try again later or check your network connection.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Function to display apps in the UI
+        function displayApps(appsToDisplay) {
+            allAppsContainer.innerHTML = ''; // Clear previous content
+            if (appsToDisplay.length === 0) {
+                allAppsContainer.innerHTML = `
+                    <div class="col-span-full text-center p-8 bg-gray-800 rounded-lg border border-purple-700">
+                        <p class="text-gray-400">No apps found matching your criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            appsToDisplay.forEach(app => {
+                const appCard = `
+                    <div class="bg-gray-800 p-6 rounded-2xl shadow-xl border border-purple-700 card-hover-effect">
+                        <img src="${app.appLogoUrl || 'https://placehold.co/100x100/A020F0/FFFFFF?text=App'}" alt="${app.appName} Logo" 
+                             class="w-24 h-24 rounded-2xl mx-auto mb-4 border-2 border-purple-500 object-cover"
+                             onerror="this.onerror=null;this.src='https://placehold.co/100x100/A020F0/FFFFFF?text=App';">
+                        <h3 class="text-xl font-bold mb-2 text-center text-purple-300">${app.appName}</h3>
+                        <p class="text-sm text-gray-400 mb-4 text-center">${app.shortDescription}</p>
+                        <p class="text-xs text-gray-500 mb-2 text-center">Category: ${app.appCategory}</p>
+                        <p class="text-xs text-gray-500 mb-4 text-center">By: ${app.developerName}</p>
+                        ${app.apkUrl ?
+                            `<a href="${app.apkUrl}" download class="w-full block text-center bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-xl shadow-lg btn-hover-effect">Download APK</a>`
+                            : app.websiteUrl ?
+                            `<a href="${app.websiteUrl}" target="_blank" rel="noopener noreferrer" class="w-full block text-center bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-xl shadow-lg btn-hover-effect">Visit Website</a>`
+                            : `<button class="w-full bg-gray-600 text-gray-300 font-semibold py-2 px-4 rounded-xl shadow-lg cursor-not-allowed" disabled>Not Available</button>`
+                        }
+                    </div>
+                `;
+                allAppsContainer.insertAdjacentHTML('beforeend', appCard);
+            });
+        }
+
+        // Search functionality
+        appSearchInput.addEventListener('input', (event) => {
+            const searchTerm = event.target.value.toLowerCase();
+            const filteredApps = allApps.filter(app =>
+                app.appName.toLowerCase().includes(searchTerm) ||
+                app.shortDescription.toLowerCase().includes(searchTerm) ||
+                app.longDescription.toLowerCase().includes(searchTerm) ||
+                app.developerName.toLowerCase().includes(searchTerm) ||
+                app.appCategory.toLowerCase().includes(searchTerm)
+            );
+            displayApps(filteredApps);
+        });
+
+
+        // Modal Open/Close functionality
+        developerBtn.addEventListener('click', () => {
+            developerModal.classList.remove('hidden');
+            // Animate modal in
+            setTimeout(() => {
+                modalContent.classList.remove('opacity-0', 'scale-95');
+                modalContent.classList.add('opacity-100', 'scale-100');
+            }, 10); // Small delay for transition to apply
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            // Animate modal out
+            modalContent.classList.remove('opacity-100', 'scale-100');
+            modalContent.classList.add('opacity-0', 'scale-95');
+            setTimeout(() => {
+                developerModal.classList.add('hidden');
+            }, 300); // Wait for transition to complete before hiding
+        });
+
+        // Close modal if clicking outside the modal content
+        developerModal.addEventListener('click', (event) => {
+            if (event.target === developerModal) {
+                // Animate modal out
+                modalContent.classList.remove('opacity-100', 'scale-100');
+                modalContent.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    developerModal.classList.add('hidden');
+                }, 300); // Wait for transition to complete before hiding
+            }
+        });
+
+        // Initial fetch of approved apps when the page loads
+        document.addEventListener('DOMContentLoaded', fetchApprovedApps);
+    </script>
 </body>
 </html>
