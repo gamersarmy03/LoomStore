@@ -177,6 +177,8 @@
     <div id="message-box" class="message-box"></div>
 
     <script type="module">
+        console.log("developer.html script loaded."); // Debug log
+
         // Import Appwrite SDK
         import { Client, Databases, ID } from 'https://cdn.jsdelivr.net/npm/appwrite@11.0.0/dist/esm/sdk.mjs';
 
@@ -368,7 +370,7 @@
         // --- Form Submission Logic ---
         submissionForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            console.log("Submission form submitted!"); // Debug log
+            console.log("Submission form submitted. Starting validation..."); // Debug log 1
 
             let isValid = true;
             const requiredFields = submissionForm.querySelectorAll('[required]');
@@ -400,9 +402,12 @@
             }
 
             if (!isValid) {
+                console.log("Form validation failed."); // Debug log 2
                 showMessageBox('Please fill in all required fields and correct image errors.', 'error');
                 return;
             }
+
+            console.log("Form validation successful. Preparing data for Appwrite..."); // Debug log 3
 
             // Simulate file uploads and get dummy URLs
             const appLogoUrl = appLogoInput.files[0] ? simulateFileUpload(appLogoInput.files[0], 'logo') : '';
@@ -428,6 +433,9 @@
                 appImageUrls: appImageUrls,
             };
 
+            console.log("Submission data ready:", submissionData); // Debug log 4
+            showMessageBox('Submitting app...', 'info'); // Give immediate feedback
+
             try {
                 const response = await databases.createDocument(
                     APPWRITE_DATABASE_ID,
@@ -435,19 +443,20 @@
                     ID.unique(), // Let Appwrite generate a unique ID
                     submissionData
                 );
-                console.log('App submitted successfully to Appwrite:', response);
+                console.log('App submitted successfully to Appwrite:', response); // Debug log 5 (Success)
                 showMessageBox('App submitted successfully! We will review it shortly.', 'success');
-                submissionForm.reset(); // Reset form after successful submission
-                toggleDistributionMethod(); // Reset distribution method visibility
-                appLogoInput.value = ''; // Clear file inputs
+                // Form reset logic
+                submissionForm.reset();
+                toggleDistributionMethod();
+                appLogoInput.value = '';
                 appScreenshotsInput.value = '';
                 document.getElementById('apk-file').value = '';
                 logoError.classList.add('hidden');
                 screenshotsError.classList.add('hidden');
                 updateCharCounts();
             } catch (error) {
-                console.error('Error submitting app to Appwrite:', error);
-                showMessageBox('Error submitting app. Please try again.', 'error');
+                console.error('Error submitting app to Appwrite:', error); // Debug log 6 (Error)
+                showMessageBox(`Error submitting app: ${error.message || 'Unknown error'}. Check console for details.`, 'error');
             }
         });
     </script>
