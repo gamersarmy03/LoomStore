@@ -1,207 +1,79 @@
-<!-- File: main.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LoomStore - The App Store</title>
+    <title>LoomStore - The Future of Apps</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="loomstore.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body class="bg-black text-gray-200">
+<body class="bg-black text-white font-sans">
 
     <!-- Header -->
-    <header class="sticky top-0 z-50 bg-black/80 backdrop-blur-sm border-b border-gray-800">
+    <header class="sticky top-0 z-50 bg-black bg-opacity-80 backdrop-blur-md border-b border-purple-900/50 shadow-lg">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
             <a href="main.html" class="text-2xl font-bold text-white">
-                <span style="color: #a020f0;">Loom</span>Store
+                <i class="fas fa-layer-group text-purple-500"></i> Loom<span class="text-purple-500">Store</span>
             </a>
             <div class="flex items-center space-x-4">
-                <a href="console.html" class="text-gray-300 hover:text-white transition">Admin Console</a>
-                <a href="developer.html" class="btn-purple">Developer</a>
+                <a href="developer.html" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-transform transform hover:scale-105">
+                    Developer
+                </a>
+                 <a href="console.html" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-shield-halved"></i> Admin
+                </a>
             </div>
         </nav>
     </header>
 
     <!-- Main Content -->
     <main class="container mx-auto px-6 py-8">
-        <!-- Hero and Search Section -->
-        <section class="text-center mb-12">
-            <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-4">Discover Your Next Favorite App</h1>
-            <p class="text-lg text-gray-400 mb-8 max-w-2xl mx-auto">Browse a curated collection of innovative apps, submitted by developers from around the world.</p>
-            <div class="max-w-xl mx-auto">
-                <input id="search-bar" type="text" placeholder="Search for apps..." class="form-input text-center">
-            </div>
+        
+        <!-- Hero Section -->
+        <section class="text-center my-12">
+            <h1 class="text-5xl md:text-6xl font-extrabold mb-4 leading-tight">Discover Your Next Favorite App</h1>
+            <p class="text-lg text-gray-400 max-w-2xl mx-auto">Browse our curated collection of innovative and powerful applications, approved for quality and security.</p>
         </section>
 
-        <!-- App Grid -->
-        <section>
-            <h2 class="text-3xl font-bold text-white mb-6">Featured Apps</h2>
-            <div id="loading-spinner" class="text-center py-10">
-                <div class="spinner"></div>
-                <p class="mt-4 text-gray-400">Loading awesome apps...</p>
-            </div>
-            <div id="app-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <!-- App cards will be injected here by JavaScript -->
-            </div>
-            <p id="no-apps-message" class="hidden text-center text-gray-500 py-10">No approved apps found. Check back later or submit one from the developer portal!</p>
-        </section>
-    </main>
-
-    <!-- App Detail Modal -->
-    <div id="app-detail-modal" class="modal-backdrop">
-        <div class="modal-content relative">
-            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl">×</button>
-            <div id="modal-body">
-                <!-- Modal content will be injected here by JavaScript -->
+        <!-- Search Bar -->
+        <div class="mb-12">
+            <div class="relative max-w-3xl mx-auto">
+                <input type="text" id="searchInput" placeholder="Search for apps by name or category..." class="w-full bg-gray-900/50 border-2 border-gray-700 focus:border-purple-500 rounded-lg py-3 px-5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300">
+                <i class="fas fa-search absolute right-5 top-1/2 -translate-y-1/2 text-gray-500"></i>
             </div>
         </div>
+
+        <!-- App Grid -->
+        <section id="app-grid-container">
+            <div id="loader" class="text-center py-12">
+                <i class="fas fa-spinner fa-spin text-purple-500 text-4xl"></i>
+                <p class="mt-4 text-gray-400">Loading awesome apps...</p>
+            </div>
+            <div id="app-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                <!-- App cards will be injected here by JavaScript -->
+            </div>
+            <p id="no-apps-message" class="hidden text-center text-gray-500 py-12">No approved apps found. Check back later!</p>
+            <p id="no-search-results" class="hidden text-center text-gray-500 py-12">No apps match your search.</p>
+        </section>
+
+    </main>
+
+    <!-- App Modal -->
+    <div id="app-modal" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div id="modal-content" class="bg-gray-900 rounded-2xl shadow-2xl shadow-purple-900/20 max-w-4xl w-full max-h-[90vh] overflow-y-auto relative border border-gray-700">
+             <!-- Content will be injected by JavaScript -->
+        </div>
     </div>
-    
-    <!-- CDNs for Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/appwrite@11.0.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
 
-    <script>
-        // --- Appwrite Configuration ---
-        const { Client, Databases, Query, ID } = Appwrite;
-        const client = new Client();
-        client
-            .setEndpoint('https://cloud.appwrite.io/v1')
-            .setProject('68528057001314063369');
-        const databases = new Databases(client);
-        const DATABASE_ID = '6852a77b0029f40ae7a4';
-        const COLLECTION_ID = '6852a7a3001e4713b6f6';
 
-        // --- DOM Elements ---
-        const appGrid = document.getElementById('app-grid');
-        const loadingSpinner = document.getElementById('loading-spinner');
-        const noAppsMessage = document.getElementById('no-apps-message');
-        const searchBar = document.getElementById('search-bar');
-        const modal = document.getElementById('app-detail-modal');
-        const modalBody = document.getElementById('modal-body');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        
-        let allApps = []; // Cache for search functionality
+    <!-- Footer -->
+    <footer class="bg-gray-900/50 mt-16 py-6 border-t border-gray-800">
+        <div class="container mx-auto text-center text-gray-500">
+            <p>© 2024 LoomStore. All Rights Reserved.</p>
+        </div>
+    </footer>
 
-        // --- Functions ---
-        
-        function createAppCard(app) {
-            const card = document.createElement('div');
-            card.className = 'app-card';
-            card.dataset.appId = app.$id;
-            
-            card.innerHTML = `
-                <div class="p-4 flex items-center space-x-4">
-                    <img src="${DOMPurify.sanitize(app.appLogoUrl)}" alt="${DOMPurify.sanitize(app.appName)} Logo" class="w-16 h-16 rounded-lg object-cover">
-                    <div>
-                        <h3 class="font-bold text-lg text-white">${DOMPurify.sanitize(app.appName)}</h3>
-                        <p class="text-sm text-gray-400">${DOMPurify.sanitize(app.shortDescription)}</p>
-                    </div>
-                </div>
-            `;
-            
-            card.addEventListener('click', () => showAppDetails(app.$id));
-            return card;
-        }
-        
-        function renderApps(appsToRender) {
-            appGrid.innerHTML = '';
-            if (appsToRender.length > 0) {
-                appsToRender.forEach(app => {
-                    const card = createAppCard(app);
-                    appGrid.appendChild(card);
-                });
-                noAppsMessage.classList.add('hidden');
-            } else {
-                 noAppsMessage.classList.remove('hidden');
-                 if(allApps.length > 0) { // Case where search yields no results
-                    noAppsMessage.textContent = 'No apps match your search.';
-                 } else { // Case where there are no apps at all
-                    noAppsMessage.textContent = 'No approved apps found. Check back later or submit one from the developer portal!';
-                 }
-            }
-        }
-        
-        async function fetchApprovedApps() {
-            try {
-                loadingSpinner.style.display = 'block';
-                const response = await databases.listDocuments(
-                    DATABASE_ID,
-                    COLLECTION_ID,
-                    [Query.equal('status', 'approved')]
-                );
-                allApps = response.documents;
-                renderApps(allApps);
-            } catch (error) {
-                console.error('Failed to fetch apps:', error);
-                noAppsMessage.textContent = 'Error: Could not load apps.';
-                noAppsMessage.classList.remove('hidden');
-            } finally {
-                loadingSpinner.style.display = 'none';
-            }
-        }
-
-        function showAppDetails(appId) {
-            const app = allApps.find(a => a.$id === appId);
-            if (!app) return;
-
-            const screenshotsHtml = app.appImageUrls.map(url => 
-                `<img src="${DOMPurify.sanitize(url)}" class="w-full h-auto rounded-lg object-contain">`
-            ).join('');
-
-            const downloadButtonHtml = app.distributionMethod === 'apk'
-                ? `<a href="${DOMPurify.sanitize(app.apkUrl)}" target="_blank" rel="noopener noreferrer" class="btn-purple inline-block mt-4">Download APK</a>`
-                : `<a href="${DOMPurify.sanitize(app.websiteUrl)}" target="_blank" rel="noopener noreferrer" class="btn-purple inline-block mt-4">Visit Website</a>`;
-            
-            modalBody.innerHTML = `
-                <div class="flex flex-col md:flex-row gap-6">
-                    <img src="${DOMPurify.sanitize(app.appLogoUrl)}" alt="${DOMPurify.sanitize(app.appName)} Logo" class="w-24 h-24 md:w-32 md:h-32 rounded-xl object-cover flex-shrink-0">
-                    <div class="flex-grow">
-                        <h2 class="text-3xl font-bold text-white">${DOMPurify.sanitize(app.appName)}</h2>
-                        <p class="text-sm text-gray-400 mb-2">by ${DOMPurify.sanitize(app.developerName)}</p>
-                        <span class="inline-block bg-purple-500/20 text-purple-300 text-xs font-semibold px-2.5 py-0.5 rounded-full">${DOMPurify.sanitize(app.appCategory)}</span>
-                    </div>
-                </div>
-                <div class="mt-6">
-                    <h3 class="text-xl font-semibold text-white mb-2">Description</h3>
-                    <p class="text-gray-300 whitespace-pre-wrap">${DOMPurify.sanitize(app.longDescription)}</p>
-                </div>
-                <div class="mt-6">
-                    <h3 class="text-xl font-semibold text-white mb-4">Screenshots</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        ${screenshotsHtml}
-                    </div>
-                </div>
-                <div class="mt-6">
-                    ${downloadButtonHtml}
-                </div>
-            `;
-            modal.classList.add('active');
-        }
-
-        function closeModal() {
-            modal.classList.remove('active');
-        }
-
-        // --- Event Listeners ---
-        searchBar.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const filteredApps = allApps.filter(app => 
-                app.appName.toLowerCase().includes(searchTerm)
-            );
-            renderApps(filteredApps);
-        });
-
-        closeModalBtn.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal();
-            }
-        });
-        
-        // --- Initial Load ---
-        document.addEventListener('DOMContentLoaded', fetchApprovedApps);
-    </script>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
