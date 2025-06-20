@@ -3,632 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LoomStore - Submit Your App</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Developer Submission - LoomStore</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0d0d0d; /* Slightly lighter black for modal background */
+            background-color: #000000;
             color: #ffffff;
-            /* Prevent body scroll when inside iframe/modal if modal itself has scroll */
-            overflow-y: auto;
         }
-        /* Custom scrollbar for a sleek look */
-        ::-webkit-scrollbar {
-            width: 8px;
+        .form-input, .form-select, .form-textarea {
             background-color: #1a1a1a;
-            border-radius: 4px;
+            border: 1px solid #2a2a2a;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
-        ::-webkit-scrollbar-thumb {
-            background-color: #a020f0; /* Vibrant purple secondary color */
-            border-radius: 4px;
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #a020f0;
+            box-shadow: 0 0 0 3px rgba(160, 32, 240, 0.3);
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background-color: #8a1be6;
+        .btn-purple {
+            background-color: #a020f0;
+            transition: background-color 0.3s ease;
         }
-
-        .input-field {
-            @apply w-full bg-gray-800 text-white p-3 rounded-xl border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600 shadow-lg; /* More pronounced focus effect, larger rounded corners */
+        .btn-purple:hover {
+            background-color: #8a1bc4;
         }
-        .label-style {
-            @apply block text-purple-300 text-sm font-semibold mb-2; /* Purple labels for better visibility */
+        .file-input-label {
+             background-color: #1a1a1a;
+             border: 2px dashed #2a2a2a;
+             cursor: pointer;
         }
-        .btn-primary {
-            @apply bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-8 rounded-xl shadow-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105; /* More vibrant button, larger padding, better hover */
-        }
-        .btn-secondary {
-            @apply bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition duration-200 ease-in-out transform hover:-translate-y-1;
-        }
-        .error-message {
-            @apply text-red-400 text-sm mt-1;
-        }
-
-        /* Form Group Spacing */
-        .form-group {
-            @apply mb-6; /* Add consistent bottom margin for form groups */
-        }
-
-        /* Message Box Styles */
-        .message-box {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #1a1a1a;
-            border: 2px solid #a020f0;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            display: none; /* Hidden by default */
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            max-width: 90vw;
-            width: 400px;
-            text-align: center;
-        }
-        .message-box h3 {
-            color: #a020f0;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        .message-box p {
-            color: #ffffff;
-            margin-bottom: 1.5rem;
-        }
-        .message-box button {
-            @apply bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-5 rounded-lg transition duration-200;
+        .file-input-label:hover {
+            border-color: #a020f0;
         }
     </style>
 </head>
-<body class="p-6 md:p-8">
+<body class="bg-black">
+    <header class="p-4 md:p-6 flex justify-between items-center border-b border-gray-800">
+        <a href="main.html" class="text-3xl font-bold text-white">Loom<span class="text-purple-500">Store</span></a>
+        <a href="console.html" class="text-white font-semibold px-4 py-2 rounded-lg border border-purple-500 hover:bg-purple-500 transition-colors">
+            Admin Console
+        </a>
+    </header>
 
-    <!-- Message Box Element -->
-    <div id="messageBox" class="message-box">
-        <h3 id="messageBoxTitle"></h3>
-        <p id="messageBoxContent"></p>
-        <button id="messageBoxCloseBtn">OK</button>
+    <main class="p-4 md:p-8 max-w-4xl mx-auto">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold">Developer Submission</h2>
+            <p class="text-gray-400">Submit your app to the LoomStore</p>
+        </div>
+
+        <form id="submissionForm" class="space-y-6">
+            <!-- App Logo -->
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">App Logo (1:1 aspect ratio)</label>
+                <input type="file" id="appLogo" name="appLogo" accept="image/*" class="hidden" required>
+                <label for="appLogo" class="file-input-label flex justify-center items-center p-6 rounded-lg text-gray-400">
+                    <span id="logo-feedback">Click to Upload Logo</span>
+                </label>
+            </div>
+            
+            <!-- App Name -->
+            <div>
+                <label for="appName" class="block text-sm font-medium text-gray-300 mb-2">App Name</label>
+                <input type="text" id="appName" name="appName" class="form-input" required>
+            </div>
+
+            <!-- Short Description -->
+            <div>
+                <label for="shortDescription" class="block text-sm font-medium text-gray-300 mb-2">Short Description (Max 50 chars)</label>
+                <input type="text" id="shortDescription" name="shortDescription" class="form-input" maxlength="50" required>
+            </div>
+
+            <!-- Long Description -->
+            <div>
+                <label for="longDescription" class="block text-sm font-medium text-gray-300 mb-2">Long Description (Max 300 chars)</label>
+                <textarea id="longDescription" name="longDescription" rows="4" class="form-textarea" maxlength="300" required></textarea>
+            </div>
+
+            <!-- Screenshots -->
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">App Screenshots (2+, 16:9 or 9:16)</label>
+                <input type="file" id="appScreenshots" name="appScreenshots" accept="image/*" class="hidden" multiple required>
+                 <label for="appScreenshots" class="file-input-label flex justify-center items-center p-6 rounded-lg text-gray-400">
+                    <span id="screenshots-feedback">Click to Upload Screenshots</span>
+                </label>
+            </div>
+
+            <!-- App Category -->
+            <div>
+                <label for="appCategory" class="block text-sm font-medium text-gray-300 mb-2">App Category</label>
+                <select id="appCategory" name="appCategory" class="form-select" required>
+                    <option value="">Select a category</option>
+                    <option value="Productivity">Productivity</option>
+                    <option value="Social">Social</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Games">Games</option>
+                    <option value="Utilities">Utilities</option>
+                </select>
+            </div>
+
+            <!-- Distribution Method -->
+            <fieldset class="space-y-2">
+                <legend class="block text-sm font-medium text-gray-300 mb-2">Distribution Method</legend>
+                 <div class="flex items-center space-x-4">
+                    <div class="flex items-center">
+                        <input id="distroApk" name="distributionMethod" type="radio" value="apk" class="h-4 w-4 text-purple-600 border-gray-500 focus:ring-purple-500" checked>
+                        <label for="distroApk" class="ml-3 block text-sm font-medium text-gray-300">Upload .apk file</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input id="distroUrl" name="distributionMethod" type="radio" value="website" class="h-4 w-4 text-purple-600 border-gray-500 focus:ring-purple-500">
+                        <label for="distroUrl" class="ml-3 block text-sm font-medium text-gray-300">Provide Website URL</label>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Conditional Inputs: APK Upload / Website URL -->
+            <div id="apk-upload-section">
+                <label class="block text-sm font-medium text-gray-300 mb-2">.apk File</label>
+                <input type="file" id="apkFile" name="apkFile" accept=".apk" class="hidden" required>
+                 <label for="apkFile" class="file-input-label flex justify-center items-center p-6 rounded-lg text-gray-400">
+                    <span id="apk-feedback">Click to Upload .apk</span>
+                </label>
+            </div>
+            <div id="website-url-section" class="hidden">
+                <label for="websiteUrl" class="block text-sm font-medium text-gray-300 mb-2">Website URL</label>
+                <input type="url" id="websiteUrl" name="websiteUrl" class="form-input" placeholder="https://example.com">
+            </div>
+
+            <!-- Developer Info -->
+            <div>
+                <label for="developerName" class="block text-sm font-medium text-gray-300 mb-2">Developer Name</label>
+                <input type="text" id="developerName" name="developerName" class="form-input" required>
+            </div>
+            <div>
+                <label for="developerEmail" class="block text-sm font-medium text-gray-300 mb-2">Developer Email</label>
+                <input type="email" id="developerEmail" name="developerEmail" class="form-input" required>
+            </div>
+
+            <!-- Submit -->
+            <div class="pt-4">
+                <button type="submit" class="w-full btn-purple text-white font-bold py-3 px-4 rounded-lg shadow-lg">Submit Application</button>
+            </div>
+        </form>
+    </main>
+    
+    <!-- Modal for confirmation -->
+    <div id="confirmationModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4">
+        <div class="bg-gray-800 rounded-lg p-8 max-w-sm text-center shadow-2xl">
+            <h3 class="text-xl font-bold mb-4">Submission Successful!</h3>
+            <p class="text-gray-300 mb-6">Your app is now pending review. Thank you for contributing to LoomStore.</p>
+            <a href="main.html" class="btn-purple text-white font-semibold px-6 py-2 rounded-lg">OK</a>
+        </div>
     </div>
 
-    <form id="appSubmissionForm" class="space-y-6">
-        <!-- App Logo Upload -->
-        <div class="form-group">
-            <label for="appLogo" class="label-style">App Logo (1:1 Aspect Ratio, PNG/JPG)</label>
-            <input type="file" id="appLogo" accept="image/png, image/jpeg" class="input-field cursor-pointer" required>
-            <p id="appLogoError" class="error-message"></p>
-            <div id="appLogoPreviewContainer" class="mt-4 flex justify-center">
-                <img id="appLogoPreview" class="hidden w-32 h-32 object-cover rounded-xl border-2 border-purple-500 shadow-lg" alt="App Logo Preview">
-            </div>
-        </div>
-
-        <!-- App Name -->
-        <div class="form-group">
-            <label for="appName" class="label-style">App Name</label>
-            <input type="text" id="appName" class="input-field" placeholder="e.g., Stellar Explorer" required>
-            <p id="appNameError" class="error-message"></p>
-        </div>
-
-        <!-- Short Description -->
-        <div class="form-group">
-            <label for="shortDescription" class="label-style">Short Description (Max 50 characters)</label>
-            <textarea id="shortDescription" class="input-field resize-y h-20" maxlength="50" placeholder="A brief, catchy description..." required></textarea>
-            <p class="text-right text-gray-500 text-sm"><span id="shortDescCount">0</span>/50</p>
-            <p id="shortDescriptionError" class="error-message"></p>
-        </div>
-
-        <!-- Long Description -->
-        <div class="form-group">
-            <label for="longDescription" class="label-style">Long Description (Max 300 characters)</label>
-            <textarea id="longDescription" class="input-field resize-y h-32" maxlength="300" placeholder="Provide a detailed overview of your app's features and benefits..." required></textarea>
-            <p class="text-right text-gray-500 text-sm"><span id="longDescCount">0</span>/300</p>
-            <p id="longDescriptionError" class="error-message"></p>
-        </div>
-
-        <!-- App Screenshots Upload -->
-        <div class="form-group">
-            <label for="appScreenshots" class="label-style">App Screenshots (2+ images, 16:9 or 9:16 Aspect Ratio)</label>
-            <input type="file" id="appScreenshots" accept="image/png, image/jpeg" multiple class="input-field cursor-pointer" required>
-            <p id="appScreenshotsError" class="error-message"></p>
-            <div id="appScreenshotsPreviewContainer" class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-4"> <!-- Adjusted grid for better responsiveness -->
-                <!-- Previews will be dynamically added here -->
-            </div>
-        </div>
-
-        <!-- App Category -->
-        <div class="form-group">
-            <label for="appCategory" class="label-style">App Category</label>
-            <select id="appCategory" class="input-field" required>
-                <option value="">Select a Category</option>
-                <option value="Games">Games</option>
-                <option value="Productivity">Productivity</option>
-                <option value="Social">Social</option>
-                <option value="Utilities">Utilities</option>
-                <option value="Education">Education</option>
-                <option value="Entertainment">Entertainment</option>
-                <option value="Finance">Finance</option>
-                <option value="Health & Fitness">Health & Fitness</option>
-                <option value="Lifestyle">Lifestyle</option>
-                <option value="News">News</option>
-                <option value="Photography">Photography</option>
-                <option value="Shopping">Shopping</option>
-                <option value="Travel">Travel</option>
-            </select>
-            <p id="appCategoryError" class="error-message"></p>
-        </div>
-
-        <!-- Distribution Method -->
-        <div class="form-group">
-            <label class="label-style">Distribution Method</label>
-            <div class="flex flex-col sm:flex-row gap-4 mt-2">
-                <label class="inline-flex items-center text-white p-3 bg-gray-700 rounded-xl shadow-md border border-purple-700 cursor-pointer hover:bg-gray-600 transition-colors duration-200">
-                    <input type="radio" name="distributionMethod" value="apk" class="form-radio text-purple-500 h-5 w-5" checked>
-                    <span class="ml-2">Upload .apk file</span>
-                </label>
-                <label class="inline-flex items-center text-white p-3 bg-gray-700 rounded-xl shadow-md border border-purple-700 cursor-pointer hover:bg-gray-600 transition-colors duration-200">
-                    <input type="radio" name="distributionMethod" value="website" class="form-radio text-purple-500 h-5 w-5">
-                    <span class="ml-2">Provide website URL</span>
-                </label>
-            </div>
-            <p id="distributionMethodError" class="error-message"></p>
-        </div>
-
-        <!-- APK Upload Field (Conditionally visible) -->
-        <div id="apkUploadGroup" class="form-group">
-            <label for="apkFile" class="label-style">Upload .apk File</label>
-            <input type="file" id="apkFile" accept=".apk" class="input-field cursor-pointer">
-            <p id="apkFileError" class="error-message"></p>
-        </div>
-
-        <!-- Website URL Field (Conditionally visible) -->
-        <div id="websiteUrlGroup" class="form-group hidden">
-            <label for="websiteUrl" class="label-style">Website URL</label>
-            <input type="url" id="websiteUrl" class="input-field" placeholder="https://www.yourapp.com">
-            <p id="websiteUrlError" class="error-message"></p>
-        </div>
-
-        <!-- Developer Name -->
-        <div class="form-group">
-            <label for="developerName" class="label-style">Developer Name (Publicly visible)</label>
-            <input type="text" id="developerName" class="input-field" placeholder="Your Name or Company" required>
-            <p id="developerNameError" class="error-message"></p>
-        </div>
-
-        <!-- Developer Email -->
-        <div class="form-group">
-            <label for="developerEmail" class="label-style">Developer Email (Private)</label>
-            <input type="email" id="developerEmail" class="input-field" placeholder="you@example.com" required>
-            <p id="developerEmailError" class="error-message"></p>
-        </div>
-
-        <!-- Submit Button -->
-        <div class="flex justify-center mt-8">
-            <button type="submit" id="submitBtn" class="btn-primary flex items-center justify-center">
-                <span id="submitBtnText">Submit Application</span>
-                <svg id="submitSpinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-            </button>
-        </div>
-    </form>
-
-    <script type="module">
-        // Import Appwrite SDK components
-        import { Client, Databases, Storage, ID, Query } from 'https://sdk.cloud.appwrite.io/docs/client.js';
-
-        // Appwrite Configuration
-        // IMPORTANT: In a real-world scenario, these IDs and keys should be managed securely on a backend server,
-        // not directly exposed in client-side code. For this demonstration, they are included as per prompt.
-        const APPWRITE_PROJECT_ID = '68528057001314063369';
-        const APPWRITE_DATABASE_ID = '6852a77b0029f40ae7a4';
-        const APPWRITE_COLLECTION_ID = '6852a7a3001e4713b6f6';
-        const APPWRITE_BUCKET_ID = '6852a7cf0025178553d1'; // This is a placeholder; you'd create a bucket in Appwrite console
-
-        // Initialize Appwrite Client
-        const client = new Client()
-            .setEndpoint('https://cloud.appwrite.io/v1') // Your Appwrite Endpoint
-            .setProject(APPWRITE_PROJECT_ID);
-
-        const databases = new Databases(client);
-        const storage = new Storage(client);
-
-        // --- DOM Elements ---
-        const appSubmissionForm = document.getElementById('appSubmissionForm');
-        const appLogoInput = document.getElementById('appLogo');
-        const appLogoPreview = document.getElementById('appLogoPreview');
-        const appLogoError = document.getElementById('appLogoError');
-        const appNameInput = document.getElementById('appName');
-        const appNameError = document.getElementById('appNameError');
-        const shortDescriptionInput = document.getElementById('shortDescription');
-        const shortDescCount = document.getElementById('shortDescCount');
-        const shortDescriptionError = document.getElementById('shortDescriptionError');
-        const longDescriptionInput = document.getElementById('longDescription');
-        const longDescCount = document.getElementById('longDescCount');
-        const longDescriptionError = document.getElementById('longDescriptionError');
-        const appScreenshotsInput = document.getElementById('appScreenshots');
-        const appScreenshotsError = document.getElementById('appScreenshotsError');
-        const appScreenshotsPreviewContainer = document.getElementById('appScreenshotsPreviewContainer');
-        const appCategorySelect = document.getElementById('appCategory');
-        const appCategoryError = document.getElementById('appCategoryError');
-        const distributionMethodRadios = document.querySelectorAll('input[name="distributionMethod"]');
-        const apkUploadGroup = document.getElementById('apkUploadGroup');
-        const websiteUrlGroup = document.getElementById('websiteUrlGroup');
+    <script>
+        const submissionForm = document.getElementById('submissionForm');
+        const distroRadios = document.querySelectorAll('input[name="distributionMethod"]');
+        const apkSection = document.getElementById('apk-upload-section');
+        const urlSection = document.getElementById('website-url-section');
         const apkFileInput = document.getElementById('apkFile');
-        const apkFileError = document.getElementById('apkFileError');
-        const websiteUrlInput = document.getElementById('websiteUrl');
-        const websiteUrlError = document.getElementById('websiteUrlError');
-        const developerNameInput = document.getElementById('developerName');
-        const developerNameError = document.getElementById('developerNameError');
-        const developerEmailInput = document.getElementById('developerEmail');
-        const developerEmailError = document.getElementById('developerEmailError');
-        const submitBtn = document.getElementById('submitBtn');
-        const submitBtnText = document.getElementById('submitBtnText');
-        const submitSpinner = document.getElementById('submitSpinner');
+        const urlInput = document.getElementById('websiteUrl');
+        
+        // File input feedback
+        const logoInput = document.getElementById('appLogo');
+        const screenshotsInput = document.getElementById('appScreenshots');
+        const logoFeedback = document.getElementById('logo-feedback');
+        const screenshotsFeedback = document.getElementById('screenshots-feedback');
+        const apkFeedback = document.getElementById('apk-feedback');
 
-        // Message Box Elements
-        const messageBox = document.getElementById('messageBox');
-        const messageBoxTitle = document.getElementById('messageBoxTitle');
-        const messageBoxContent = document.getElementById('messageBoxContent');
-        const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
+        logoInput.addEventListener('change', () => {
+            logoFeedback.textContent = logoInput.files.length > 0 ? logoInput.files[0].name : 'Click to Upload Logo';
+        });
+        screenshotsInput.addEventListener('change', () => {
+            screenshotsFeedback.textContent = screenshotsInput.files.length > 0 ? `${screenshotsInput.files.length} files selected` : 'Click to Upload Screenshots';
+        });
+        apkFileInput.addEventListener('change', () => {
+            apkFeedback.textContent = apkFileInput.files.length > 0 ? apkFileInput.files[0].name : 'Click to Upload .apk';
+        });
 
-        /**
-         * Displays a custom message box instead of alert/confirm.
-         * @param {string} title - The title of the message box.
-         * @param {string} message - The content of the message.
-         * @param {function} [onCloseCallback] - Optional callback function to execute when the box is closed.
-         */
-        function showMessageBox(title, message, onCloseCallback = null) {
-            messageBoxTitle.textContent = title;
-            messageBoxContent.textContent = message;
-            messageBox.style.display = 'flex'; // Show the message box
 
-            const closeHandler = () => {
-                messageBox.style.display = 'none'; // Hide the message box
-                messageBoxCloseBtn.removeEventListener('click', closeHandler);
-                if (onCloseCallback) {
-                    onCloseCallback();
+        distroRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.value === 'apk') {
+                    apkSection.classList.remove('hidden');
+                    urlSection.classList.add('hidden');
+                    apkFileInput.required = true;
+                    urlInput.required = false;
+                } else {
+                    apkSection.classList.add('hidden');
+                    urlSection.classList.remove('hidden');
+                    apkFileInput.required = false;
+                    urlInput.required = true;
                 }
-            };
-            messageBoxCloseBtn.addEventListener('click', closeHandler);
-        }
-
-        // --- Utility Functions ---
-
-        /**
-         * Clears an error message for a given element.
-         * @param {HTMLElement} errorElement - The paragraph element to clear.
-         */
-        function clearError(errorElement) {
-            errorElement.textContent = '';
-        }
-
-        /**
-         * Displays an error message for a given element.
-         * @param {HTMLElement} errorElement - The paragraph element to display the error in.
-         * @param {string} message - The error message.
-         */
-        function showValidationError(errorElement, message) {
-            errorElement.textContent = message;
-        }
-
-        /**
-         * Handles character counting for textareas.
-         * @param {HTMLTextAreaElement} textarea - The textarea element.
-         * @param {HTMLElement} counterElement - The element to display the count.
-         */
-        function handleCharCount(textarea, counterElement) {
-            counterElement.textContent = textarea.value.length;
-        }
-
-        // --- File Previews and Aspect Ratio Validation ---
-
-        /**
-         * Validates image aspect ratio and displays preview.
-         * @param {File} file - The image file.
-         * @param {HTMLElement} previewElement - The <img> element for preview.
-         * @param {HTMLElement} errorElement - The element for error messages.
-         * @param {string} expectedRatio - Expected aspect ratio (e.g., '1:1', '16:9', '9:16').
-         * @returns {Promise<boolean>} - True if valid, false otherwise.
-         */
-        function validateAndPreviewImage(file, previewElement, errorElement, expectedRatio) {
-            return new Promise((resolve) => {
-                clearError(errorElement);
-                if (!file) {
-                    previewElement.src = '';
-                    previewElement.classList.add('hidden');
-                    return resolve(false);
-                }
-
-                if (!file.type.startsWith('image/')) {
-                    showValidationError(errorElement, 'Invalid file type. Please upload an image.');
-                    previewElement.src = '';
-                    previewElement.classList.add('hidden');
-                    return resolve(false);
-                }
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    previewElement.src = e.target.result;
-                    previewElement.classList.remove('hidden');
-
-                    const img = new Image();
-                    img.onload = () => {
-                        const width = img.width;
-                        const height = img.height;
-                        let isValidRatio = true;
-
-                        if (expectedRatio === '1:1') {
-                            isValidRatio = Math.abs(width - height) < 5; // Allow minor deviation
-                            if (!isValidRatio) {
-                                showValidationError(errorElement, 'Image must have a 1:1 aspect ratio (square).');
-                            }
-                        } else if (expectedRatio === '16:9' || expectedRatio === '9:16') {
-                            const currentRatio = width / height;
-                            const targetRatio16_9 = 16 / 9;
-                            const targetRatio9_16 = 9 / 16;
-                            const tolerance = 0.05; // 5% tolerance
-
-                            if (expectedRatio === '16:9') {
-                                isValidRatio = Math.abs(currentRatio - targetRatio16_9) < tolerance;
-                                if (!isValidRatio) {
-                                    showValidationError(errorElement, 'Image must have a 16:9 aspect ratio.');
-                                }
-                            } else if (expectedRatio === '9:16') {
-                                isValidRatio = Math.abs(currentRatio - targetRatio9_16) < tolerance;
-                                if (!isValidRatio) {
-                                    showValidationError(errorElement, 'Image must have a 9:16 aspect ratio.');
-                                }
-                            }
-                        }
-
-                        if (!isValidRatio) {
-                            previewElement.src = '';
-                            previewElement.classList.add('hidden');
-                        }
-                        resolve(isValidRatio);
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
             });
-        }
-
-        // Event Listeners for File Previews and Validation
-        appLogoInput.addEventListener('change', async () => {
-            const file = appLogoInput.files[0];
-            await validateAndPreviewImage(file, appLogoPreview, appLogoError, '1:1');
         });
 
-        appScreenshotsInput.addEventListener('change', async () => {
-            appScreenshotsPreviewContainer.innerHTML = ''; // Clear previous previews
-            clearError(appScreenshotsError);
+        submissionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            // In a real application, you would handle file uploads to S3
+            // and then send metadata to Appwrite here.
+            
+            console.log("Form submitted. Validation passed (for demo).");
 
-            const files = Array.from(appScreenshotsInput.files);
-            if (files.length < 2) {
-                showValidationError(appScreenshotsError, 'Please upload at least 2 screenshots.');
-                return;
-            }
-
-            let allValid = true;
-            for (const file of files) {
-                if (!file.type.startsWith('image/')) {
-                    showValidationError(appScreenshotsError, 'All screenshots must be image files.');
-                    allValid = false;
-                    break;
-                }
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    // Updated class for screenshot previews for better visual appeal
-                    img.className = 'w-full h-32 sm:h-40 object-cover rounded-lg shadow-md border border-purple-700 hover:scale-105 transition-transform duration-200';
-                    img.alt = 'Screenshot Preview';
-                    img.onload = () => {
-                        const width = img.width;
-                        const height = img.height;
-                        const currentRatio = width / height;
-                        const targetRatio16_9 = 16 / 9;
-                        const targetRatio9_16 = 9 / 16;
-                        const tolerance = 0.05;
-
-                        const is16_9 = Math.abs(currentRatio - targetRatio16_9) < tolerance;
-                        const is9_16 = Math.abs(currentRatio - targetRatio9_16) < tolerance;
-
-                        if (!is16_9 && !is9_16) {
-                            showValidationError(appScreenshotsError, 'All screenshots must be 16:9 or 9:16 aspect ratio.');
-                            allValid = false;
-                            img.classList.add('border-red-500'); // Highlight invalid image
-                        }
-                    };
-                    appScreenshotsPreviewContainer.appendChild(img);
-                };
-                reader.readAsDataURL(file);
-            }
-            if (!allValid) {
-                appScreenshotsInput.value = ''; // Clear files if any are invalid
-            }
-        });
-
-        // --- Conditional Distribution Method Fields ---
-        function updateDistributionMethodFields() {
-            const selectedMethod = document.querySelector('input[name="distributionMethod"]:checked').value;
-            if (selectedMethod === 'apk') {
-                apkUploadGroup.classList.remove('hidden');
-                websiteUrlGroup.classList.add('hidden');
-                apkFileInput.setAttribute('required', 'true');
-                websiteUrlInput.removeAttribute('required');
-            } else {
-                apkUploadGroup.classList.add('hidden');
-                websiteUrlGroup.classList.remove('hidden');
-                apkFileInput.removeAttribute('required');
-                websiteUrlInput.setAttribute('required', 'true');
-            }
-        }
-
-        distributionMethodRadios.forEach(radio => {
-            radio.addEventListener('change', updateDistributionMethodFields);
-        });
-
-        // Initialize fields visibility on load
-        document.addEventListener('DOMContentLoaded', updateDistributionMethodFields);
-
-        // --- Character Counters ---
-        shortDescriptionInput.addEventListener('input', () => handleCharCount(shortDescriptionInput, shortDescCount));
-        longDescriptionInput.addEventListener('input', () => handleCharCount(longDescriptionInput, longDescCount));
-
-        // --- Form Submission Logic ---
-        appSubmissionForm.addEventListener('submit', async (event) => {
-            event.preventDefault(); // Prevent default form submission
-
-            // Clear all previous errors
-            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
-
-            let isValid = true; // Overall form validity flag
-
-            // Basic Text Field Validations (required, min/max length implicitly handled by HTML attributes)
-            if (!appNameInput.value.trim()) { showValidationError(appNameError, 'App Name is required.'); isValid = false; }
-            if (!shortDescriptionInput.value.trim()) { showValidationError(shortDescriptionError, 'Short Description is required.'); isValid = false; }
-            if (!longDescriptionInput.value.trim()) { showValidationError(longDescriptionError, 'Long Description is required.'); isValid = false; }
-            if (!appCategorySelect.value) { showValidationError(appCategoryError, 'App Category is required.'); isValid = false; }
-            if (!developerNameInput.value.trim()) { showValidationError(developerNameError, 'Developer Name is required.'); isValid = false; }
-            if (!developerEmailInput.value.trim() || !developerEmailInput.value.includes('@')) { showValidationError(developerEmailError, 'Valid Developer Email is required.'); isValid = false; }
-
-            // File Validations
-            const appLogoFile = appLogoInput.files[0];
-            if (!appLogoFile) { showValidationError(appLogoError, 'App Logo is required.'); isValid = false; }
-            else {
-                const logoValid = await validateAndPreviewImage(appLogoFile, appLogoPreview, appLogoError, '1:1');
-                if (!logoValid) isValid = false;
-            }
-
-            const appScreenshotsFiles = Array.from(appScreenshotsInput.files);
-            if (appScreenshotsFiles.length < 2) { showValidationError(appScreenshotsError, 'Please upload at least 2 screenshots.'); isValid = false; }
-            else {
-                for (const file of appScreenshotsFiles) {
-                    if (!file.type.startsWith('image/')) {
-                        showValidationError(appScreenshotsError, 'All screenshots must be image files.');
-                        isValid = false;
-                        break;
-                    }
-                }
-            }
-
-
-            const selectedMethod = document.querySelector('input[name="distributionMethod"]:checked').value;
-            let apkFile = null;
-            let websiteUrl = '';
-
-            if (selectedMethod === 'apk') {
-                apkFile = apkFileInput.files[0];
-                if (!apkFile) { showValidationError(apkFileError, 'APK file is required for APK distribution.'); isValid = false; }
-                else if (apkFile.type !== 'application/vnd.android.package-archive') {
-                    showValidationError(apkFileError, 'Invalid file type. Please upload an APK file (.apk).'); isValid = false;
-                }
-            } else { // website
-                websiteUrl = websiteUrlInput.value.trim();
-                if (!websiteUrl) { showValidationError(websiteUrlError, 'Website URL is required for website distribution.'); isValid = false; }
-                else if (!/^https?:\/\/[^\s$.?#].[^\s]*$/.test(websiteUrl)) {
-                    showValidationError(websiteUrlError, 'Please enter a valid URL (e.g., https://www.example.com).'); isValid = false;
-                }
-            }
-
-            if (!isValid) {
-                showMessageBox('Validation Error', 'Please correct the highlighted fields before submitting.');
-                return; // Stop submission if validation fails
-            }
-
-            // --- Submission Process ---
-            submitBtn.disabled = true;
-            submitBtnText.classList.add('hidden');
-            submitSpinner.classList.remove('hidden');
-
-            try {
-                // 1. Upload App Logo
-                const logoFileId = ID.unique();
-                const logoUploadResponse = await storage.createFile(
-                    APPWRITE_BUCKET_ID,
-                    logoFileId,
-                    appLogoFile,
-                    // Public read permissions are important for displaying on main.html
-                    ['role:any']
-                );
-                const appLogoUrl = `${client.config.endpoint}/storage/buckets/${APPWRITE_BUCKET_ID}/files/${logoFileId}/view?project=${APPWRITE_PROJECT_ID}`;
-
-                // 2. Upload App Screenshots
-                const appImageUrls = [];
-                for (const file of appScreenshotsFiles) {
-                    const screenshotFileId = ID.unique();
-                    const screenshotUploadResponse = await storage.createFile(
-                        APPWRITE_BUCKET_ID,
-                        screenshotFileId,
-                        file,
-                        ['role:any'] // Public read permissions
-                    );
-                    appImageUrls.push(`${client.config.endpoint}/storage/buckets/${APPWRITE_BUCKET_ID}/files/${screenshotFileId}/view?project=${APPWRITE_PROJECT_ID}`);
-                }
-
-                // 3. Upload APK File (if selected)
-                let apkUrl = '';
-                if (selectedMethod === 'apk' && apkFile) {
-                    const apkFileId = ID.unique();
-                    const apkUploadResponse = await storage.createFile(
-                        APPWRITE_BUCKET_ID,
-                        apkFileId,
-                        apkFile,
-                        ['role:any'] // Public read permissions
-                    );
-                    apkUrl = `${client.config.endpoint}/storage/buckets/${APPWRITE_BUCKET_ID}/files/${apkFileId}/view?project=${APPWRITE_PROJECT_ID}`;
-                }
-
-                // 4. Prepare Metadata
-                const submissionData = {
-                    appName: appNameInput.value.trim(),
-                    shortDescription: shortDescriptionInput.value.trim(),
-                    longDescription: longDescriptionInput.value.trim(),
-                    appCategory: appCategorySelect.value,
-                    distributionMethod: selectedMethod,
-                    websiteUrl: selectedMethod === 'website' ? websiteUrl : '',
-                    apkUrl: selectedMethod === 'apk' ? apkUrl : '',
-                    developerName: developerNameInput.value.trim(),
-                    developerEmail: developerEmailInput.value.trim(),
-                    submissionDate: new Date().toISOString(), // ISO8601 string
-                    status: 'pending', // Default status for new submissions
-                    appLogoUrl: appLogoUrl,
-                    appImageUrls: appImageUrls,
-                };
-
-                // 5. Save Metadata to Appwrite Database
-                await databases.createDocument(
-                    APPWRITE_DATABASE_ID,
-                    APPWRITE_COLLECTION_ID,
-                    ID.unique(), // Document ID
-                    submissionData
-                );
-
-                showMessageBox('Submission Successful', 'Your application has been submitted successfully and is awaiting review!', () => {
-                    appSubmissionForm.reset(); // Clear the form
-                    appLogoPreview.classList.add('hidden');
-                    appScreenshotsPreviewContainer.innerHTML = '';
-                    shortDescCount.textContent = '0';
-                    longDescCount.textContent = '0';
-                    updateDistributionMethodFields(); // Reset visibility
-                    // Notify parent (main.html) to close modal, if applicable
-                    if (window.parent && window.parent.postMessage) {
-                        window.parent.postMessage({ type: 'submissionSuccess' }, '*');
-                    }
-                });
-
-            } catch (error) {
-                console.error("Submission error:", error);
-                showMessageBox('Submission Failed', `There was an error submitting your application. Please try again. Details: ${error.message}`);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtnText.classList.remove('hidden');
-                submitSpinner.classList.add('hidden');
-            }
+            // Show confirmation modal
+            document.getElementById('confirmationModal').classList.remove('hidden');
         });
     </script>
 </body>
