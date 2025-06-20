@@ -1,50 +1,60 @@
-<!-- File: developer.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Developer Submission - LoomStore</title>
+    <title>Developer Portal - LoomStore</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="loomstore.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body class="bg-black text-gray-200">
+<body class="bg-black text-white font-sans">
 
     <!-- Header -->
-    <header class="bg-black/80 backdrop-blur-sm border-b border-gray-800">
+    <header class="bg-black bg-opacity-80 backdrop-blur-md border-b border-purple-900/50 shadow-lg">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-             <a href="main.html" class="text-2xl font-bold text-white">
-                <span style="color: #a020f0;">Loom</span>Store
+            <a href="main.html" class="text-2xl font-bold text-white">
+                <i class="fas fa-layer-group text-purple-500"></i> Loom<span class="text-purple-500">Store</span>
             </a>
-            <a href="main.html" class="btn-outline">← Back to Store</a>
+            <a href="main.html" class="text-gray-300 hover:text-white transition-colors">
+                <i class="fas fa-times mr-2"></i>Close
+            </a>
         </nav>
     </header>
 
-    <!-- Submission Form -->
+    <!-- Main Content -->
     <main class="container mx-auto px-6 py-8">
-        <div class="max-w-4xl mx-auto bg-gray-900/50 p-8 rounded-lg border border-gray-800">
-            <h1 class="text-3xl font-bold text-white mb-2">Submit Your App</h1>
-            <p class="text-gray-400 mb-8">Fill out the form below to submit your application to the LoomStore for review.</p>
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-4xl font-bold text-center mb-2">Developer Submission</h1>
+            <p class="text-gray-400 text-center mb-10">Submit your application to the LoomStore. All fields are required unless marked optional.</p>
 
-            <form id="submission-form" class="space-y-6">
+            <form id="submission-form" class="space-y-8 bg-gray-900/50 p-8 rounded-2xl border border-gray-700 shadow-lg">
                 <!-- App Info -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="md:col-span-1">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+                    <div class="md:col-span-1 flex flex-col items-center">
                         <label for="appLogo" class="block text-sm font-medium text-gray-300 mb-2">App Logo (1:1)</label>
-                        <input type="file" id="appLogo" accept="image/*" class="hidden" required>
-                        <label for="appLogo" class="file-input-label flex flex-col items-center justify-center">
-                            <span id="logo-preview-container"><svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></span>
-                            <span id="logo-filename" class="text-xs mt-2">Click to upload</span>
-                        </label>
+                        <img id="logo-preview" src="https://placehold.co/256x256/1a1a1a/a020f0?text=Logo" alt="Logo Preview" class="w-48 h-48 rounded-2xl object-cover border-2 border-dashed border-gray-600 mb-2">
+                        <input type="file" id="appLogo" name="appLogo" accept="image/*" class="file-input" required>
                     </div>
                     <div class="md:col-span-2 space-y-6">
                         <div>
                             <label for="appName" class="block text-sm font-medium text-gray-300 mb-2">App Name</label>
-                            <input type="text" id="appName" class="form-input" required>
+                            <input type="text" id="appName" name="appName" class="form-input" required>
                         </div>
                         <div>
                             <label for="shortDescription" class="block text-sm font-medium text-gray-300 mb-2">Short Description (max 50 chars)</label>
-                            <input type="text" id="shortDescription" class="form-input" maxlength="50" required>
+                            <input type="text" id="shortDescription" name="shortDescription" class="form-input" maxlength="50" required>
+                        </div>
+                         <div>
+                            <label for="appCategory" class="block text-sm font-medium text-gray-300 mb-2">App Category</label>
+                            <select id="appCategory" name="appCategory" class="form-input" required>
+                                <option value="Productivity">Productivity</option>
+                                <option value="Games">Games</option>
+                                <option value="Utilities">Utilities</option>
+                                <option value="Social">Social Networking</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Finance">Finance</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -52,302 +62,65 @@
                 <!-- Long Description -->
                 <div>
                     <label for="longDescription" class="block text-sm font-medium text-gray-300 mb-2">Long Description (max 300 chars)</label>
-                    <textarea id="longDescription" rows="4" class="form-input" maxlength="300" required></textarea>
+                    <textarea id="longDescription" name="longDescription" rows="4" class="form-input" maxlength="300" required></textarea>
                 </div>
-                
+
                 <!-- Screenshots -->
                 <div>
-                    <label for="appScreenshots" class="block text-sm font-medium text-gray-300 mb-2">App Screenshots (16:9 or 9:16, 2+ required)</label>
-                    <input type="file" id="appScreenshots" accept="image/*" class="hidden" multiple required>
-                     <label for="appScreenshots" class="file-input-label">
-                        <span id="screenshots-feedback">Click to upload screenshots</span>
-                     </label>
+                    <label for="appScreenshots" class="block text-sm font-medium text-gray-300 mb-2">App Screenshots (2+, 16:9 or 9:16)</label>
+                    <input type="file" id="appScreenshots" name="appScreenshots" accept="image/*" class="file-input" multiple required>
+                    <div id="screenshots-preview" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4"></div>
                 </div>
 
-                <!-- Category & Distribution -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="appCategory" class="block text-sm font-medium text-gray-300 mb-2">App Category</label>
-                        <select id="appCategory" class="form-input" required>
-                            <option>Productivity</option>
-                            <option>Games</option>
-                            <option>Utilities</option>
-                            <option>Social</option>
-                            <option>Entertainment</option>
-                            <option>Health & Fitness</option>
-                        </select>
+                <!-- Distribution -->
+                <div class="border-t border-gray-700 pt-8">
+                    <h3 class="text-lg font-semibold mb-4">Distribution Method</h3>
+                    <div class="flex items-center space-x-8 mb-4">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="distributionMethod" value="apk" class="form-radio" checked>
+                            <span>Upload .apk File</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="distributionMethod" value="website" class="form-radio">
+                            <span>Provide Website URL</span>
+                        </label>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Distribution Method</label>
-                        <div class="flex space-x-4 mt-2">
-                             <label class="flex items-center"><input type="radio" name="distributionMethod" value="apk" class="form-radio h-4 w-4 text-purple-600 bg-gray-700 border-gray-600" checked> <span class="ml-2">Upload .apk file</span></label>
-                             <label class="flex items-center"><input type="radio" name="distributionMethod" value="website" class="form-radio h-4 w-4 text-purple-600 bg-gray-700 border-gray-600"> <span class="ml-2">Provide Website URL</span></label>
-                        </div>
+                    <div id="apk-upload-field">
+                        <label for="apkFile" class="block text-sm font-medium text-gray-300 mb-2">.apk File</label>
+                        <input type="file" id="apkFile" name="apkFile" accept=".apk" class="file-input">
+                    </div>
+                    <div id="website-url-field" class="hidden">
+                        <label for="websiteUrl" class="block text-sm font-medium text-gray-300 mb-2">Website URL</label>
+                        <input type="url" id="websiteUrl" name="websiteUrl" placeholder="https://yourapp.com" class="form-input">
                     </div>
                 </div>
 
-                <!-- Conditional Inputs -->
-                <div id="apk-upload-container">
-                    <label for="apkFile" class="block text-sm font-medium text-gray-300 mb-2">.apk File</label>
-                    <input type="file" id="apkFile" accept=".apk" class="hidden" required>
-                    <label for="apkFile" class="file-input-label">
-                        <span id="apk-filename">Click to upload .apk</span>
-                    </label>
-                </div>
-                <div id="website-url-container" class="hidden">
-                    <label for="websiteUrl" class="block text-sm font-medium text-gray-300 mb-2">Website URL</label>
-                    <input type="url" id="websiteUrl" class="form-input" placeholder="https://example.com">
-                </div>
-
-                <!-- Developer Info -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-gray-800 pt-6">
+                 <!-- Developer Info -->
+                <div class="border-t border-gray-700 pt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="developerName" class="block text-sm font-medium text-gray-300 mb-2">Developer Name</label>
-                        <input type="text" id="developerName" class="form-input" required>
+                        <input type="text" id="developerName" name="developerName" class="form-input" required>
                     </div>
                     <div>
                         <label for="developerEmail" class="block text-sm font-medium text-gray-300 mb-2">Developer Email (private)</label>
-                        <input type="email" id="developerEmail" class="form-input" required>
+                        <input type="email" id="developerEmail" name="developerEmail" class="form-input" required>
                     </div>
                 </div>
                 
                 <!-- Submission -->
-                <div class="text-right border-t border-gray-800 pt-6">
-                    <button id="submit-btn" type="submit" class="btn-purple w-full md:w-auto">
+                <div class="pt-5">
+                    <button type="submit" id="submit-btn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-105">
                         <span id="submit-btn-text">Submit for Review</span>
-                        <div id="submit-spinner" class="spinner hidden mx-auto"></div>
+                        <i id="submit-spinner" class="fas fa-spinner fa-spin ml-2 hidden"></i>
                     </button>
                 </div>
-
-                <!-- Status Message -->
-                <div id="status-message" class="hidden text-center p-4 rounded-md"></div>
             </form>
+            
+            <!-- Notification Area -->
+            <div id="notification" class="hidden mt-6 p-4 rounded-lg text-center font-semibold"></div>
         </div>
     </main>
-    
-    <!-- CDNs for Libraries -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/appwrite@11.0.0"></script>
-    <script type="module">
-        // Import S3 client - Note: In a real project, use a bundler. This is a workaround for browsers.
-        import { S3Client, PutObjectCommand } from "https://cdn.skypack.dev/@aws-sdk/client-s3";
 
-        // --- Configuration ---
-        const { Client: AppwriteClient, Databases, ID } = Appwrite;
-        
-        // Appwrite Config
-        const APPWRITE_PROJECT_ID = '68528057001314063369';
-        const APPWRITE_DATABASE_ID = '6852a77b0029f40ae7a4';
-        const APPWRITE_COLLECTION_ID = '6852a7a3001e4713b6f6';
-        
-        // Archive.org S3-compatible Storage Config
-        const S3_ACCESS_KEY = 'cFDtuIpumfXlW76M';
-        const S3_SECRET_KEY = 'NVbTrPoAOnJYzeMJ';
-        const S3_ENDPOINT = 'https://s3.us.archive.org';
-
-        // --- SDK Initialization ---
-        const appwriteClient = new AppwriteClient()
-            .setEndpoint('https://cloud.appwrite.io/v1')
-            .setProject(APPWRITE_PROJECT_ID);
-        const databases = new Databases(appwriteClient);
-
-        const s3Client = new S3Client({
-            region: 'us-east-1', // Default region, archive.org doesn't really use it
-            endpoint: S3_ENDPOINT,
-            credentials: {
-                accessKeyId: S3_ACCESS_KEY,
-                secretKey: S3_SECRET_KEY,
-            },
-            forcePathStyle: true, // Required for archive.org
-        });
-
-        // --- DOM Elements ---
-        const form = document.getElementById('submission-form');
-        const submitBtn = document.getElementById('submit-btn');
-        const submitBtnText = document.getElementById('submit-btn-text');
-        const submitSpinner = document.getElementById('submit-spinner');
-        const statusMessage = document.getElementById('status-message');
-        
-        // Input Elements
-        const appLogoInput = document.getElementById('appLogo');
-        const appScreenshotsInput = document.getElementById('appScreenshots');
-        const apkFileInput = document.getElementById('apkFile');
-        const websiteUrlInput = document.getElementById('websiteUrl');
-        const distributionRadios = document.querySelectorAll('input[name="distributionMethod"]');
-        
-        // UI Feedback Elements
-        const logoPreviewContainer = document.getElementById('logo-preview-container');
-        const logoFilename = document.getElementById('logo-filename');
-        const screenshotsFeedback = document.getElementById('screenshots-feedback');
-        const apkFilename = document.getElementById('apk-filename');
-        
-        // --- UI Logic ---
-        distributionRadios.forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                const isApk = e.target.value === 'apk';
-                document.getElementById('apk-upload-container').style.display = isApk ? 'block' : 'none';
-                document.getElementById('website-url-container').style.display = isApk ? 'none' : 'block';
-                apkFileInput.required = isApk;
-                websiteUrlInput.required = !isApk;
-            });
-        });
-
-        appLogoInput.addEventListener('change', () => {
-            if (appLogoInput.files && appLogoInput.files[0]) {
-                const file = appLogoInput.files[0];
-                logoFilename.textContent = file.name;
-                const reader = new FileReader();
-                reader.onload = e => {
-                    logoPreviewContainer.innerHTML = `<img src="${e.target.result}" class="w-16 h-16 rounded-lg object-cover">`;
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-
-        appScreenshotsInput.addEventListener('change', () => {
-             screenshotsFeedback.textContent = `${appScreenshotsInput.files.length} screenshot(s) selected.`;
-        });
-        
-        apkFileInput.addEventListener('change', () => {
-            apkFilename.textContent = apkFileInput.files.length > 0 ? apkFileInput.files[0].name : 'Click to upload .apk';
-        });
-
-        // --- Helper Functions ---
-        function showStatus(message, isError = false) {
-            statusMessage.textContent = message;
-            statusMessage.className = `p-4 rounded-md text-center ${isError ? 'bg-red-500/20 text-red-300' : 'bg-green-500/20 text-green-300'}`;
-            statusMessage.classList.remove('hidden');
-        }
-
-        function toggleLoading(isLoading) {
-            submitBtn.disabled = isLoading;
-            submitSpinner.classList.toggle('hidden', !isLoading);
-            submitBtnText.classList.toggle('hidden', isLoading);
-        }
-        
-        async function uploadToS3(file, bucket, key) {
-            const command = new PutObjectCommand({
-                Bucket: bucket,
-                Key: key,
-                Body: file,
-                ACL: 'public-read' // Make file publicly accessible
-            });
-            await s3Client.send(command);
-            // Archive.org public URL format
-            return `https://archive.org/download/${bucket}/${key}`;
-        }
-
-        function validateImageAspectRatio(file, targetRatio1, targetRatio2) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        const ratio = this.width / this.height;
-                        const tolerance = 0.05;
-                        const isRatio1 = Math.abs(ratio - targetRatio1) < tolerance;
-                        const isRatio2 = targetRatio2 ? Math.abs(ratio - targetRatio2) < tolerance : false;
-                        resolve(isRatio1 || isRatio2);
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-
-        // --- Main Submission Logic ---
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            toggleLoading(true);
-            statusMessage.classList.add('hidden');
-
-            try {
-                // --- 1. Form Data ---
-                const formData = {
-                    appName: document.getElementById('appName').value,
-                    shortDescription: document.getElementById('shortDescription').value,
-                    longDescription: document.getElementById('longDescription').value,
-                    appCategory: document.getElementById('appCategory').value,
-                    distributionMethod: document.querySelector('input[name="distributionMethod"]:checked').value,
-                    websiteUrl: document.getElementById('websiteUrl').value,
-                    developerName: document.getElementById('developerName').value,
-                    developerEmail: document.getElementById('developerEmail').value,
-                };
-
-                const logoFile = appLogoInput.files[0];
-                const screenshotFiles = Array.from(appScreenshotsInput.files);
-                const apkFile = apkFileInput.files[0];
-
-                // --- 2. Validation ---
-                if (!await validateImageAspectRatio(logoFile, 1/1)) {
-                    throw new Error("Logo must have a 1:1 aspect ratio (be a square).");
-                }
-                if (screenshotFiles.length < 2) {
-                    throw new Error("Please upload at least 2 screenshots.");
-                }
-                for (const file of screenshotFiles) {
-                    if (!await validateImageAspectRatio(file, 16/9, 9/16)) {
-                         throw new Error("All screenshots must have a 16:9 or 9:16 aspect ratio.");
-                    }
-                }
-                
-                // --- 3. S3 Upload ---
-                // Create a unique identifier for this submission to act as a "bucket" or "folder"
-                const submissionId = `loomstore-${ID.unique()}`;
-
-                // Upload Logo
-                const appLogoUrl = await uploadToS3(logoFile, submissionId, `logo-${logoFile.name}`);
-
-                // Upload Screenshots
-                const appImageUrls = await Promise.all(
-                    screenshotFiles.map(file => uploadToS3(file, submissionId, `screenshot-${file.name}`))
-                );
-
-                // Upload APK if provided
-                let apkUrl = null;
-                if (formData.distributionMethod === 'apk' && apkFile) {
-                    apkUrl = await uploadToS3(apkFile, submissionId, `apk-${apkFile.name}`);
-                }
-
-                // --- 4. Prepare Appwrite Data ---
-                const appwriteData = {
-                    ...formData,
-                    appLogoUrl,
-                    appImageUrls,
-                    apkUrl,
-                    status: 'pending',
-                    submissionDate: new Date().toISOString(),
-                };
-                // Don't save empty URL if method is APK
-                if(appwriteData.distributionMethod === 'apk') {
-                    delete appwriteData.websiteUrl;
-                }
-
-                // --- 5. Save to Appwrite ---
-                await databases.createDocument(
-                    APPWRITE_DATABASE_ID,
-                    APPWRITE_COLLECTION_ID,
-                    ID.unique(),
-                    appwriteData
-                );
-                
-                // --- 6. Success ---
-                showStatus('Submission successful! Your app is now pending review.', false);
-                form.reset();
-                // Manually reset UI feedback elements
-                logoPreviewContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>`;
-                logoFilename.textContent = 'Click to upload';
-                screenshotsFeedback.textContent = 'Click to upload screenshots';
-                apkFilename.textContent = 'Click to upload .apk';
-
-
-            } catch (error) {
-                console.error('Submission failed:', error);
-                showStatus(`Submission failed: ${error.message}`, true);
-            } finally {
-                toggleLoading(false);
-            }
-        });
-    </script>
+    <script type="module" src="js/developer.js"></script>
 </body>
 </html>
