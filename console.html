@@ -3,448 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LoomStore Admin Console</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Admin Console - LoomStore</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@appwrite.io/sdk@15.0.0/dist/index.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.1491.0/aws-sdk.min.js"></script>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #000000; /* Dark black primary theme */
-            color: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #2a2a2a;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #a020f0; /* Vibrant purple */
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #8e1ad4;
-        }
-
-        .purple-gradient-button {
-            background: linear-gradient(to right, #a020f0, #c879ff);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            box-shadow: 0 4px 15px rgba(160, 32, 240, 0.4);
-        }
-        .purple-gradient-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(160, 32, 240, 0.6);
-        }
-        .purple-border {
-            border-color: #a020f0;
-        }
-        .purple-text {
-            color: #a020f0;
-        }
-
-        .card-animation {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        .card-animation:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(160, 32, 240, 0.3);
-        }
-
-        .modal-overlay {
-            background-color: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            transition: opacity 0.3s ease-in-out;
-            z-index: 1000;
-        }
-        .modal-content {
-            transform: scale(0.95);
-            opacity: 0;
-            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-            max-height: 90vh; /* Limit modal height */
-            overflow-y: auto; /* Enable scrolling for modal content */
-        }
-        .modal-content.active {
-            transform: scale(1);
-            opacity: 1;
-        }
-        body.modal-open {
-            overflow: hidden; /* Hide scrollbar when modal is open */
-        }
-
-        /* Message box styling (copied from main.html for consistency) */
-        .message-box {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #333;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
             color: white;
-            padding: 15px 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            z-index: 1001;
+            font-family: 'Inter', sans-serif;
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             opacity: 0;
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            animation: fadeIn 0.5s forwards;
         }
-        .message-box.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(-10px);
+        .card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 32px-4px rgba(160, 32, 240, 0.4);
         }
-        .message-box.success {
-            background-color: #16a34a; /* Green */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .message-box.error {
-            background-color: #dc2626; /* Red */
+        .btn-purple {
+            background: linear-gradient(90deg, #a020f0, #c084fc);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-purple:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(160, 32, 240, 0.5);
+        }
+        .btn-reject {
+            background-color: #ff4444;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-reject:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 68, 68, 0.5);
+        }
+        .table-row {
+            transition: background-color 0.3s ease;
+        }
+        .table-row:hover {
+            background-color: rgba(160, 32, 240, 0.1);
         }
     </style>
 </head>
-<body class="flex flex-col">
-    <!-- Header -->
-    <header class="bg-gray-900 p-4 shadow-lg">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-3xl font-bold purple-text">LoomStore Admin</h1>
-            <nav>
-                <a href="main.html" class="text-gray-300 hover:text-white px-4 py-2 rounded-md transition-colors duration-200">Main Site</a>
-                <a href="#" class="text-white px-4 py-2 rounded-md bg-purple-700 hover:bg-purple-800 transition-colors duration-200">Admin Dashboard</a>
-            </nav>
-        </div>
-    </header>
+<body class="min-h-screen p-6">
+    <h1 class="text-3xl font-bold text-[#a020f0] mb-6 text-center">LoomStore Admin Console</h2>
+    <div id="appTable" class="grid gap-6"></div>
 
-    <!-- Main Content Area - Pending Applications -->
-    <main class="flex-grow container mx-auto px-4 py-8">
-        <h2 class="text-4xl font-extrabold mb-8 text-center">Pending App Submissions</h2>
+    <script>
+        const client = new Appwrite.Client();
+        client.setEndpoint('https://cloud.appwrite.io/v1').setProject('68528057001314063369');
+        const database = new Appwrite.Databases(client);
 
-        <div id="pending-applications" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- App Submission Cards will be dynamically loaded here by JavaScript -->
-        </div>
-        <p id="no-submissions-message" class="text-center text-gray-400 mt-8 hidden">No pending app submissions found.</p>
-    </main>
-
-    <!-- Modals -->
-    <!-- Approve Confirmation Modal -->
-    <div id="approve-modal" class="modal-overlay fixed inset-0 flex items-center justify-center p-4 hidden opacity-0">
-        <div class="modal-content bg-gray-900 rounded-xl shadow-2xl p-8 w-full max-w-md relative border border-purple-text">
-            <button id="close-approve-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-3xl font-bold">&times;</button>
-            <h3 class="text-2xl font-bold mb-4 text-center purple-text">Approve Submission?</h3>
-            <p class="text-gray-300 text-center mb-6">Are you sure you want to approve "<span id="approve-app-name" class="font-semibold"></span>"?</p>
-            <div id="apk-upload-on-approve-section" class="mb-4 hidden">
-                <label for="approve-apk-file" class="block text-gray-300 text-sm font-semibold mb-2">Upload Missing APK (Optional):</label>
-                <input type="file" id="approve-apk-file" accept=".apk" class="w-full p-2 rounded-lg bg-gray-800 border border-gray-700 focus:ring focus:ring-purple-text focus:border-purple-text">
-            </div>
-            <input type="text" id="reviewer-name-approve" placeholder="Your Name (Reviewer)" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:ring focus:ring-purple-text focus:border-purple-text mb-4" required>
-            <div class="flex justify-center space-x-4">
-                <button id="confirm-approve" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200">Confirm Approve</button>
-                <button id="cancel-approve" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Reject Confirmation Modal -->
-    <div id="reject-modal" class="modal-overlay fixed inset-0 flex items-center justify-center p-4 hidden opacity-0">
-        <div class="modal-content bg-gray-900 rounded-xl shadow-2xl p-8 w-full max-w-md relative border border-purple-text">
-            <button id="close-reject-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-3xl font-bold">&times;</button>
-            <h3 class="text-2xl font-bold mb-4 text-center purple-text">Reject Submission?</h3>
-            <p class="text-gray-300 text-center mb-6">Are you sure you want to reject "<span id="reject-app-name" class="font-semibold"></span>"? This action cannot be undone.</p>
-            <input type="text" id="reviewer-name-reject" placeholder="Your Name (Reviewer)" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:ring focus:ring-purple-text focus:border-purple-text mb-4" required>
-            <div class="flex justify-center space-x-4">
-                <button id="confirm-reject" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200">Confirm Reject</button>
-                <button id="cancel-reject" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Message Box for Alerts -->
-    <div id="message-box" class="message-box"></div>
-
-    <script type="module">
-        // Import Appwrite SDK
-        import { Client, Databases, ID, Query } from 'https://cdn.jsdelivr.net/npm/appwrite@11.0.0/dist/esm/sdk.mjs';
-
-        // Appwrite & Archive.org S3 Configuration
-        const APPWRITE_ENDPOINT = 'https://cloud.appwrite.io/v1'; // Default Appwrite Cloud Endpoint
-        const APPWRITE_PROJECT_ID = '68528057001314063369';
-        const APPWRITE_DATABASE_ID = '6852a77b0029f40ae7a4';
-        const APPWRITE_COLLECTION_ID = '6852a7a3001e4713b6f6';
-        const ARCHIVE_S3_BASE_URL = 'https://archive.org/details/'; // A dummy base URL for simulated files
-
-        // Initialize Appwrite Client
-        const client = new Client();
-        client
-            .setEndpoint(APPWRITE_ENDPOINT)
-            .setProject(APPWRITE_PROJECT_ID);
-
-        const databases = new Databases(client);
-
-        // DOM Elements
-        const pendingApplicationsContainer = document.getElementById('pending-applications');
-        const noSubmissionsMessage = document.getElementById('no-submissions-message');
-        const approveModal = document.getElementById('approve-modal');
-        const rejectModal = document.getElementById('reject-modal');
-        const closeApproveModal = document.getElementById('close-approve-modal');
-        const closeRejectModal = document.getElementById('close-reject-modal');
-        const approveAppNameSpan = document.getElementById('approve-app-name');
-        const rejectAppNameSpan = document.getElementById('reject-app-name');
-        const confirmApproveBtn = document.getElementById('confirm-approve');
-        const cancelApproveBtn = document.getElementById('cancel-approve');
-        const confirmRejectBtn = document.getElementById('confirm-reject');
-        const cancelRejectBtn = document.getElementById('cancel-reject');
-        const apkUploadOnApproveSection = document.getElementById('apk-upload-on-approve-section');
-        const approveApkFileInput = document.getElementById('approve-apk-file');
-        const reviewerNameApproveInput = document.getElementById('reviewer-name-approve');
-        const reviewerNameRejectInput = document.getElementById('reviewer-name-reject');
-        const messageBox = document.getElementById('message-box');
-
-        let currentAppIdToProcess = null;
-        let currentAppHasMissingApk = false;
-
-        // Function to show a custom message box
-        function showMessageBox(message, type = 'info') {
-            messageBox.textContent = message;
-            messageBox.className = `message-box show ${type}`;
-            setTimeout(() => {
-                messageBox.classList.remove('show');
-                setTimeout(() => messageBox.textContent = '', 300);
-            }, 3000);
-        }
-
-        // Function to open a modal
-        function openModal(modalElement) {
-            modalElement.classList.remove('hidden');
-            document.body.classList.add('modal-open');
-            setTimeout(() => {
-                modalElement.classList.add('opacity-100');
-                modalElement.querySelector('.modal-content').classList.add('active');
-            }, 10);
-        }
-
-        // Function to close a modal
-        function closeModal(modalElement) {
-            modalElement.classList.remove('opacity-100');
-            modalElement.querySelector('.modal-content').classList.remove('active');
-            document.body.classList.remove('modal-open');
-            setTimeout(() => {
-                modalElement.classList.add('hidden');
-            }, 300);
-        }
-
-        // Event listeners for closing modals
-        closeApproveModal.addEventListener('click', () => closeModal(approveModal));
-        closeRejectModal.addEventListener('click', () => closeModal(rejectModal));
-        cancelApproveBtn.addEventListener('click', () => closeModal(approveModal));
-        cancelRejectBtn.addEventListener('click', () => closeModal(rejectModal));
-
-        // Close modal when clicking outside
-        approveModal.addEventListener('click', (e) => {
-            if (e.target === approveModal) closeModal(approveModal);
+        AWS.config.update({
+            accessKeyId: 'cFDtuIpumfIdedW76M',
+            secretAccessKey: 'NVbTrPoAOnJYzeMJ',
+            region: 'us-east-1'
         });
-        rejectModal.addEventListener('click', (e) => {
-            if (e.target === rejectModal) closeModal(rejectModal);
-        });
+        const s3 = new AWS.S3();
 
-        // Function to fetch and display pending applications from Appwrite
-        async function fetchPendingApplications() {
+        async function uploadApk(file, id) {
+            const params = {
+                Bucket: 'loomstore',
+                Key: `apkks/${id}/${Date.now()}_${file.name}`,
+                Body: file,
+                ContentType: file.type,
+                ACL: 'public-read'
+            };
+            const data = await s3.upload(params).promise();
+            return data.Location;
+        }
+
+        async function loadSubmissions() {
             try {
-                // Query Appwrite for documents where status is 'pending'
-                const response = await databases.listDocuments(
-                    APPWRITE_DATABASE_ID,
-                    APPWRITE_COLLECTION_ID,
-                    [
-                        Query.equal('status', 'pending'),
-                        Query.orderDesc('submissionDate') // Order by submission date, newest first
-                    ]
+                const response = await database.listDocuments(
+                    databaseId: '6852a77b0029f40ae7a4',
+                    collectionId: '6852a7a3001e4713b6f6',
+                    queries: [AppwriteQuery.equal('status', 'pending')]
                 );
-                const pendingApps = response.documents;
-                renderApplications(pendingApps);
-            } catch (error) {
-                console.error('Error fetching pending applications from Appwrite:', error);
-                showMessageBox('Error loading pending applications. Please check console.', 'error');
-            }
-        }
-
-        // Function to render application cards
-        function renderApplications(applications) {
-            pendingApplicationsContainer.innerHTML = ''; // Clear previous content
-
-            if (applications.length === 0) {
-                noSubmissionsMessage.classList.remove('hidden');
-                return;
-            } else {
-                noSubmissionsMessage.classList.add('hidden');
-            }
-
-            applications.forEach(app => {
-                const card = document.createElement('div');
-                card.classList.add('app-submission-card', 'bg-gray-800', 'rounded-xl', 'shadow-xl', 'p-6', 'card-animation', 'flex', 'flex-col', 'justify-between');
-                // Store the Appwrite document ID
-                card.dataset.appId = app.$id;
-                card.dataset.appName = app.appName;
-                // Check if apkUrl exists and is not null/empty string. Appwrite stores null as actual null.
-                card.dataset.apkUrl = app.apkUrl || ''; // Use empty string if null
-
-                let distributionInfo;
-                if (app.distributionMethod === 'apk') {
-                    distributionInfo = `
-                        <span class="font-semibold text-gray-300">Distribution:</span>
-                        <span class="text-purple-300 ml-2">APK File</span>
-                        ${app.apkUrl ? `<p class="text-gray-500 text-xs mt-1">APK URL: <a href="${app.apkUrl}" class="purple-text hover:underline" target="_blank">download.apk</a></p>` : `<p class="text-red-400 text-xs mt-1 font-semibold">APK Missing! Admin must upload.</p>`}
-                    `;
-                } else {
-                    distributionInfo = `
-                        <span class="font-semibold text-gray-300">Distribution:</span>
-                        <span class="text-purple-300 ml-2">Website</span>
-                        <p class="text-gray-500 text-xs mt-1">Website URL: <a href="${app.websiteUrl}" class="purple-text hover:underline" target="_blank">${app.websiteUrl}</a></p>
-                    `;
-                }
-
-                card.innerHTML = `
-                    <div>
-                        <div class="flex items-center mb-4">
-                            <img src="${app.appLogoUrl || 'https://placehold.co/64x64/a020f0/ffffff?text=L'}" alt="App Logo" class="w-16 h-16 rounded-lg mr-4 border-2 border-purple-text object-cover">
-                            <div>
-                                <h3 class="text-xl font-bold">${app.appName}</h3>
-                                <p class="text-gray-400 text-sm">Category: ${app.appCategory}</p>
+                const appTable = document.getElementById('appTable');
+                appTable.innerHTML = '';
+                response.documents.forEach((doc, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'card bg-gray-900 p-6 rounded-xl border border-gray-700';
+                    card.style.animationDelay = `${index * 0.1}s`;
+                    card.innerHTML = `
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <img src="${doc.appLogoUrl}" alt="${doc.appName}" class="w-24 h-24 rounded-lg object-cover">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold">${doc.appName}</h3>
+                                <p class="text-sm text-gray-400">${doc.shortDescription}</p>
+                                <p class="text-sm text-gray-500 mt-2">Category: ${doc.appCategory}</p>
+                                <p class="text-sm text-gray-500">Submitted: ${doc.submissionDate}</p>
+                                <p class="text-sm text-gray-500">Developer: ${doc.developerName}</p>
+                                <p class="text-sm text-gray-500">Distribution: ${doc.distributionMethod}</p>
+                                ${doc.websiteUrl ? `<p class="text-sm text-blue-500"><a href="${doc.websiteUrl}" target="_blank">Website</a></p>` : ''}
+                                ${doc.apkUrl ? `<p class="text-sm text-blue-500"><a href="${doc.apkUrl}" target="_blank">APK</a></p>` : ''}
+                            </div>
+                            <div class="flex flex-col gap-3">
+                                <button onclick="approveSubmission('${doc.id}')" class="btn-purple text-white px-px-6 py-2 rounded-lg">Approve</button>
+                                <button onclick="rejectSubmission('${doc.id}')}" class="btn-reject text-white px-px-6 py-2 rounded-lg">Reject</button>
+                                ${!doc.apkUrl ? `<input type="file" id="apk-${doc.id}" accept=".apk" class="mt-2 hidden">
+                                <label for="apk-${doc.id}" class="text-sm text-[#a020f0] cursor-pointer">Upload APK</label>` : ''}
                             </div>
                         </div>
-                        <p class="text-gray-300 mb-2 text-sm">${app.shortDescription}</p>
-                        <p class="text-gray-500 text-xs mb-4">Submitted by: ${app.developerName} (${app.developerEmail}) on ${new Date(app.submissionDate).toLocaleDateString()}</p>
-                        <div class="mb-4">
-                            ${distributionInfo}
-                        </div>
-                    </div>
-                    <div class="flex flex-col space-y-2">
-                        <button class="approve-button bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200">Approve</button>
-                        <button class="reject-button bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200">Reject</button>
-                    </div>
-                `;
-                pendingApplicationsContainer.appendChild(card);
-            });
-
-            // Add event listeners to the new buttons
-            document.querySelectorAll('.approve-button').forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const card = event.target.closest('.app-submission-card');
-                    currentAppIdToProcess = card.dataset.appId;
-                    const appName = card.dataset.appName;
-                    const apkUrl = card.dataset.apkUrl;
-
-                    approveAppNameSpan.textContent = appName;
-                    if (!apkUrl) { // Check if apkUrl is truly missing/empty string
-                        apkUploadOnApproveSection.classList.remove('hidden');
-                        currentAppHasMissingApk = true;
-                    } else {
-                        apkUploadOnApproveSection.classList.add('hidden');
-                        currentAppHasMissingApk = false;
+                    `;
+                    appTable.appendChild(card);
+                    if (!doc.apkUrl) {
+                        document.getElementById(`apk-${doc.id}`).addEventListener('change', async (e) => {
+                            const apkUrl = await uploadApk(e.target.files[0], doc.$id);
+                            await database.updateDocument(
+                                '6852a77b0029f40ae7a4',
+                                '6852a7a3001e4713b6f6',
+                                doc.$id,
+                                { apkUrl }
+                            );
+                            loadSubmissions();
+                        });
                     }
-                    approveApkFileInput.value = ''; // Clear previous file selection
-                    reviewerNameApproveInput.value = ''; // Clear reviewer name
-                    openModal(approveModal);
                 });
-            });
-
-            document.querySelectorAll('.reject-button').forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const card = event.target.closest('.app-submission-card');
-                    currentAppIdToProcess = card.dataset.appId;
-                    const appName = card.dataset.appName;
-                    rejectAppNameSpan.textContent = appName;
-                    reviewerNameRejectInput.value = ''; // Clear reviewer name
-                    openModal(rejectModal);
-                });
-            });
-        }
-
-        // Function to simulate file upload and return a dummy URL (for admin APK upload)
-        function simulateFileUpload(file, type = 'general') {
-            const fileName = file ? file.name : `dummy-file-${Date.now()}.apk`; // Default to apk
-            return `${ARCHIVE_S3_BASE_URL}loomstore-admin-${type}-${ID.unique()}-${fileName}`;
-        }
-
-        // --- Approval and Rejection Logic ---
-        confirmApproveBtn.addEventListener('click', async () => {
-            const reviewerName = reviewerNameApproveInput.value.trim();
-            if (!reviewerName) {
-                showMessageBox('Please enter your name as the reviewer.', 'error');
-                return;
-            }
-
-            let newApkUrl = null;
-            if (currentAppHasMissingApk) {
-                if (approveApkFileInput.files.length === 0) {
-                    showMessageBox('Please upload the missing APK file or cancel.', 'error');
-                    return;
-                }
-                newApkUrl = simulateFileUpload(approveApkFileInput.files[0], 'admin-apk');
-                showMessageBox('Uploading APK and approving app...', 'info');
-            } else {
-                showMessageBox('Approving app...', 'info');
-            }
-            closeModal(approveModal);
-
-            try {
-                const updateData = {
-                    status: 'approved',
-                    reviewedBy: reviewerName,
-                    reviewDate: new Date().toISOString()
-                };
-                if (newApkUrl) {
-                    updateData.apkUrl = newApkUrl; // Add APK URL if newly uploaded by admin
-                }
-
-                await databases.updateDocument(
-                    APPWRITE_DATABASE_ID,
-                    APPWRITE_COLLECTION_ID,
-                    currentAppIdToProcess,
-                    updateData
-                );
-                showMessageBox('App approved successfully!', 'success');
-                fetchPendingApplications(); // Re-fetch to update the list
             } catch (error) {
-                console.error('Error approving app:', error);
-                showMessageBox('Error approving app. Please try again.', 'error');
+                console.error('Error loading submissions:', error);
             }
-        });
+        }
 
-        confirmRejectBtn.addEventListener('click', async () => {
-            const reviewerName = reviewerNameRejectInput.value.trim();
-            if (!reviewerName) {
-                showMessageBox('Please enter your name as the reviewer.', 'error');
-                return;
-            }
-
-            showMessageBox('Rejecting app...', 'info');
-            closeModal(rejectModal);
-
+        async function approveSubmission(id) {
             try {
-                await databases.updateDocument(
-                    APPWRITE_DATABASE_ID,
-                    APPWRITE_COLLECTION_ID,
-                    currentAppIdToProcess,
+                await database.updateDocument(
+                    '6852a77b0029f40ae7a4',
+                    '6852a7a3001e4713b6f6',
+                    id,
+                    {
+                        status: 'approved',
+                        reviewedBy: 'Admin',
+                        reviewDate: new Date().toISOString(),
+                    }
+                );
+                loadSubmissions();
+                alert('Application approved');
+            } catch (error) {
+                alert('Error approving application');
+            }
+        }
+
+        async function rejectSubmission(id) {
+            try {
+                await database.updateDocument(
+                    '6852a77b0029f40ae7a4',
+                    '6852a7a3001e4713b6f6',
+                    id,
                     {
                         status: 'rejected',
-                        reviewedBy: reviewerName,
-                        reviewDate: new Date().toISOString()
+                        reviewedBy: 'Admin',
+                        reviewDate: new Date().toISOString(),
                     }
                 );
-                showMessageBox('App rejected successfully!', 'success');
-                fetchPendingApplications(); // Re-fetch to update the list
+                loadSubmissions();
+                alert('Application rejected');
             } catch (error) {
-                console.error('Error rejecting app:', error);
-                showMessageBox('Error rejecting app. Please try again.', 'error');
+                alert('Error rejecting application');
             }
-        });
+        }
 
-        // Initial fetch of applications when the page loads
-        document.addEventListener('DOMContentLoaded', fetchPendingApplications);
+        loadSubmissions();
     </script>
 </body>
 </html>
