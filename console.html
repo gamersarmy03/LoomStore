@@ -5,171 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Console - LoomStore</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@appwrite.io/sdk@15.0.0/dist/index.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.1491.0/aws-sdk.min.js"></script>
-    <style>
-        body {
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-            color: white;
-            font-family: 'Inter', sans-serif;
-        }
-        .card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            opacity: 0;
-            animation: fadeIn 0.5s forwards;
-        }
-        .card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 12px 32px-4px rgba(160, 32, 240, 0.4);
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .btn-purple {
-            background: linear-gradient(90deg, #a020f0, #c084fc);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .btn-purple:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(160, 32, 240, 0.5);
-        }
-        .btn-reject {
-            background-color: #ff4444;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .btn-reject:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 68, 68, 0.5);
-        }
-        .table-row {
-            transition: background-color 0.3s ease;
-        }
-        .table-row:hover {
-            background-color: rgba(160, 32, 240, 0.1);
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body class="min-h-screen p-6">
-    <h1 class="text-3xl font-bold text-[#a020f0] mb-6 text-center">LoomStore Admin Console</h2>
-    <div id="appTable" class="grid gap-6"></div>
+<body class="bg-black text-white font-sans">
 
-    <script>
-        const client = new Appwrite.Client();
-        client.setEndpoint('https://cloud.appwrite.io/v1').setProject('68528057001314063369');
-        const database = new Appwrite.Databases(client);
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-black bg-opacity-80 backdrop-blur-md border-b border-purple-900/50 shadow-lg">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="main.html" class="text-2xl font-bold text-white">
+                <i class="fas fa-shield-halved text-purple-500"></i> Admin <span class="text-purple-500">Console</span>
+            </a>
+            <a href="main.html" class="text-gray-300 hover:text-white transition-colors">
+                <i class="fas fa-store mr-2"></i>Back to Store
+            </a>
+        </nav>
+    </header>
 
-        AWS.config.update({
-            accessKeyId: 'cFDtuIpumfIdedW76M',
-            secretAccessKey: 'NVbTrPoAOnJYzeMJ',
-            region: 'us-east-1'
-        });
-        const s3 = new AWS.S3();
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-8">
+        
+        <section class="mb-12">
+            <h1 class="text-4xl font-bold mb-2">Pending Submissions</h1>
+            <p class="text-gray-400">Review, approve, or reject new app submissions.</p>
+        </section>
 
-        async function uploadApk(file, id) {
-            const params = {
-                Bucket: 'loomstore',
-                Key: `apkks/${id}/${Date.now()}_${file.name}`,
-                Body: file,
-                ContentType: file.type,
-                ACL: 'public-read'
-            };
-            const data = await s3.upload(params).promise();
-            return data.Location;
-        }
+        <!-- Submissions List -->
+        <section id="submissions-container">
+            <div id="loader" class="text-center py-12">
+                <i class="fas fa-spinner fa-spin text-purple-500 text-4xl"></i>
+                <p class="mt-4 text-gray-400">Fetching pending submissions...</p>
+            </div>
+            <div id="submissions-list" class="space-y-8">
+                <!-- Submission cards will be injected here by JavaScript -->
+            </div>
+            <p id="no-submissions-message" class="hidden text-center text-gray-500 py-12">Hooray! No pending submissions.</p>
+        </section>
 
-        async function loadSubmissions() {
-            try {
-                const response = await database.listDocuments(
-                    databaseId: '6852a77b0029f40ae7a4',
-                    collectionId: '6852a7a3001e4713b6f6',
-                    queries: [AppwriteQuery.equal('status', 'pending')]
-                );
-                const appTable = document.getElementById('appTable');
-                appTable.innerHTML = '';
-                response.documents.forEach((doc, index) => {
-                    const card = document.createElement('div');
-                    card.className = 'card bg-gray-900 p-6 rounded-xl border border-gray-700';
-                    card.style.animationDelay = `${index * 0.1}s`;
-                    card.innerHTML = `
-                        <div class="flex flex-col md:flex-row gap-4">
-                            <img src="${doc.appLogoUrl}" alt="${doc.appName}" class="w-24 h-24 rounded-lg object-cover">
-                            <div class="flex-1">
-                                <h3 class="text-lg font-semibold">${doc.appName}</h3>
-                                <p class="text-sm text-gray-400">${doc.shortDescription}</p>
-                                <p class="text-sm text-gray-500 mt-2">Category: ${doc.appCategory}</p>
-                                <p class="text-sm text-gray-500">Submitted: ${doc.submissionDate}</p>
-                                <p class="text-sm text-gray-500">Developer: ${doc.developerName}</p>
-                                <p class="text-sm text-gray-500">Distribution: ${doc.distributionMethod}</p>
-                                ${doc.websiteUrl ? `<p class="text-sm text-blue-500"><a href="${doc.websiteUrl}" target="_blank">Website</a></p>` : ''}
-                                ${doc.apkUrl ? `<p class="text-sm text-blue-500"><a href="${doc.apkUrl}" target="_blank">APK</a></p>` : ''}
-                            </div>
-                            <div class="flex flex-col gap-3">
-                                <button onclick="approveSubmission('${doc.id}')" class="btn-purple text-white px-px-6 py-2 rounded-lg">Approve</button>
-                                <button onclick="rejectSubmission('${doc.id}')}" class="btn-reject text-white px-px-6 py-2 rounded-lg">Reject</button>
-                                ${!doc.apkUrl ? `<input type="file" id="apk-${doc.id}" accept=".apk" class="mt-2 hidden">
-                                <label for="apk-${doc.id}" class="text-sm text-[#a020f0] cursor-pointer">Upload APK</label>` : ''}
-                            </div>
-                        </div>
-                    `;
-                    appTable.appendChild(card);
-                    if (!doc.apkUrl) {
-                        document.getElementById(`apk-${doc.id}`).addEventListener('change', async (e) => {
-                            const apkUrl = await uploadApk(e.target.files[0], doc.$id);
-                            await database.updateDocument(
-                                '6852a77b0029f40ae7a4',
-                                '6852a7a3001e4713b6f6',
-                                doc.$id,
-                                { apkUrl }
-                            );
-                            loadSubmissions();
-                        });
-                    }
-                });
-            } catch (error) {
-                console.error('Error loading submissions:', error);
-            }
-        }
+    </main>
 
-        async function approveSubmission(id) {
-            try {
-                await database.updateDocument(
-                    '6852a77b0029f40ae7a4',
-                    '6852a7a3001e4713b6f6',
-                    id,
-                    {
-                        status: 'approved',
-                        reviewedBy: 'Admin',
-                        reviewDate: new Date().toISOString(),
-                    }
-                );
-                loadSubmissions();
-                alert('Application approved');
-            } catch (error) {
-                alert('Error approving application');
-            }
-        }
+    <!-- Notification Area -->
+    <div id="notification-bar" class="fixed bottom-5 right-5 bg-green-500 text-white py-2 px-5 rounded-lg shadow-lg opacity-0 transition-all duration-300 transform translate-y-10">
+        Notification
+    </div>
 
-        async function rejectSubmission(id) {
-            try {
-                await database.updateDocument(
-                    '6852a77b0029f40ae7a4',
-                    '6852a7a3001e4713b6f6',
-                    id,
-                    {
-                        status: 'rejected',
-                        reviewedBy: 'Admin',
-                        reviewDate: new Date().toISOString(),
-                    }
-                );
-                loadSubmissions();
-                alert('Application rejected');
-            } catch (error) {
-                alert('Error rejecting application');
-            }
-        }
-
-        loadSubmissions();
-    </script>
+    <script type="module" src="js/console.js"></script>
 </body>
 </html>
